@@ -186,7 +186,7 @@ function CompactCard({ brand, index }: BrandCardProps) {
       <Card className="cursor-pointer overflow-hidden hover:border-primary/50 transition-colors rounded-xl">
         <CardContent className="p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="size-10 rounded-lg bg-white border flex items-center justify-center flex-shrink-0 p-1">
+            <div className="size-10 rounded-lg bg-white border flex items-center justify-center shrink-0 p-1">
               <motion.img
                 src={brand.logoUrl}
                 alt={brand.name}
@@ -206,7 +206,7 @@ function CompactCard({ brand, index }: BrandCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="text-right">
               <div className="font-semibold text-sm flex items-center gap-1">
                 <Star className="size-3 fill-amber-400 text-amber-400" />
@@ -272,7 +272,7 @@ function FeaturedCard({ brand, index }: BrandCardProps) {
             />
 
             {/* Gradient overlay at bottom */}
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/30 to-transparent" />
 
             {/* Favorite button */}
             <motion.button

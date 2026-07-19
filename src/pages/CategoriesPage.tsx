@@ -135,7 +135,7 @@ export function CategoriesPage() {
                       />
 
                       {/* Gradient overlay */}
-                      <div className={`absolute inset-0 bg-gradient-to-t ${config.accent}`} />
+                      <div className={`absolute inset-0 bg-linear-to-t ${config.accent}`} />
 
                       {/* Content */}
                       <div className="absolute inset-0 p-5 flex flex-col justify-between">
