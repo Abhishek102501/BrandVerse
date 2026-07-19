@@ -1,0 +1,159 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* Class-based dark mode: toggling `.dark` on <html> flips every token below. */
+@custom-variant dark (&:is(.dark *));
+
+/*
+  BrandVerse design tokens.
+  Editorial, gallery-like identity: warm paper light mode, deep ink dark mode,
+  with a single confident violet accent used sparingly.
+*/
+:root {
+  --radius: 0.75rem;
+
+  --background: oklch(0.994 0.003 95);
+  --foreground: oklch(0.205 0.01 285);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.205 0.01 285);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.205 0.01 285);
+
+  --primary: oklch(0.52 0.22 295);
+  --primary-foreground: oklch(0.985 0.002 300);
+
+  --secondary: oklch(0.965 0.004 285);
+  --secondary-foreground: oklch(0.245 0.01 285);
+
+  --muted: oklch(0.965 0.004 285);
+  --muted-foreground: oklch(0.53 0.012 285);
+
+  --accent: oklch(0.955 0.02 310);
+  --accent-foreground: oklch(0.28 0.05 300);
+
+  --destructive: oklch(0.58 0.235 27);
+  --destructive-foreground: oklch(0.985 0.002 300);
+
+  --border: oklch(0.9 0.005 285);
+  --input: oklch(0.9 0.005 285);
+  --ring: oklch(0.52 0.22 295);
+}
+
+.dark {
+  --background: oklch(0.17 0.012 290);
+  --foreground: oklch(0.965 0.004 285);
+
+  --card: oklch(0.215 0.015 290);
+  --card-foreground: oklch(0.965 0.004 285);
+
+  --popover: oklch(0.215 0.015 290);
+  --popover-foreground: oklch(0.965 0.004 285);
+
+  --primary: oklch(0.72 0.17 300);
+  --primary-foreground: oklch(0.18 0.02 295);
+
+  --secondary: oklch(0.27 0.015 290);
+  --secondary-foreground: oklch(0.965 0.004 285);
+
+  --muted: oklch(0.27 0.015 290);
+  --muted-foreground: oklch(0.7 0.012 285);
+
+  --accent: oklch(0.3 0.03 305);
+  --accent-foreground: oklch(0.965 0.004 285);
+
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.985 0.002 300);
+
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.72 0.17 300);
+}
+
+/* Expose the tokens above to Tailwind utilities (bg-background, text-primary, etc.). */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Blob animation for hero section */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
