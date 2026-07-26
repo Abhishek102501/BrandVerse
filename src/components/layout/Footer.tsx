@@ -27,10 +27,10 @@ const itemVariants = {
 
 export function Footer() {
   const socials = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  ]
+  { icon: Github,   href: 'https://github.com/Abhishek102501',                    label: 'GitHub'   },
+  { icon: Twitter,  href: 'https://x.com/Abhishe21044278',                        label: 'Twitter'  },
+  { icon: Linkedin, href: 'https://www.linkedin.com/in/abhishek-dubey-jd/',       label: 'LinkedIn' },
+]
 
   const currentYear = new Date().getFullYear()
 
@@ -65,10 +65,12 @@ export function Footer() {
 
               <div className="mt-6 flex gap-2">
                 {socials.map(({ icon: Icon, href, label }) => (
-                  <motion.a
-                    key={label}
-                    href={href}
-                    aria-label={label}
+                 <motion.a
+  key={label}
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={label}
                     className="bg-accent hover:bg-primary hover:text-primary-foreground grid size-10 place-items-center rounded-lg transition-colors"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
