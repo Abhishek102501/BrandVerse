@@ -4,9 +4,7 @@ import { X, Send, Bot, User, Loader2, Sparkles, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { mockBrands } from '@/services/brand/mock-data'
 
-// ── Paste your Groq API key here ────────────────────────────────────────────
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY ?? ''
-// ────────────────────────────────────────────────────────────────────────────
 
 interface Message {
   role: 'user' | 'assistant'
@@ -128,10 +126,9 @@ export function AiAssistant() {
 
   return (
     <>
-      {/* Floating button */}
       <motion.button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 right-6 z-50 size-14 rounded-full bg-primary text-primary-foreground shadow-xl flex items-center justify-center"
+className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 size-12 sm:size-14 rounded-full bg-primary text-primary-foreground shadow-xl hover:shadow-2xl flex items-center justify-center"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.92 }}
         aria-label="Open AI Assistant"
@@ -147,8 +144,6 @@ export function AiAssistant() {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Pulse ring */}
         {!open && (
           <motion.div
             className="absolute inset-0 rounded-full bg-primary"
@@ -158,7 +153,6 @@ export function AiAssistant() {
         )}
       </motion.button>
 
-      {/* Chat window */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -166,7 +160,7 @@ export function AiAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 32, scale: 0.92 }}
             transition={{ type: 'spring', damping: 24, stiffness: 300 }}
-            className="fixed bottom-24 right-6 z-50 w-90 sm:w-105 rounded-3xl border bg-card shadow-2xl overflow-hidden flex flex-col"
+className="fixed bottom-36 right-4 sm:bottom-24 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[360px] md:w-[420px] rounded-3xl border bg-card shadow-2xl overflow-hidden flex flex-col"
             style={{ height: '560px' }}
           >
             {/* Header */}
@@ -186,19 +180,10 @@ export function AiAssistant() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <motion.button
-                  onClick={reset}
-                  className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
-                  whileTap={{ scale: 0.9 }}
-                  title="Reset chat"
-                >
+                <motion.button onClick={reset} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" whileTap={{ scale: 0.9 }} title="Reset chat">
                   <RotateCcw className="size-4" />
                 </motion.button>
-                <motion.button
-                  onClick={() => setOpen(false)}
-                  className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
-                  whileTap={{ scale: 0.9 }}
-                >
+                <motion.button onClick={() => setOpen(false)} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors" whileTap={{ scale: 0.9 }}>
                   <X className="size-4" />
                 </motion.button>
               </div>
@@ -216,19 +201,14 @@ export function AiAssistant() {
                 >
                   <div className={cn(
                     'size-7 rounded-full flex items-center justify-center shrink-0 mt-1',
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-linear-to-br from-primary to-violet-600 text-white',
+                    msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-linear-to-br from-primary to-violet-600 text-white',
                   )}>
                     {msg.role === 'user' ? <User className="size-3.5" /> : <Bot className="size-3.5" />}
                   </div>
-
                   <div className={cn('flex flex-col gap-1 max-w-[80%]', msg.role === 'user' ? 'items-end' : 'items-start')}>
                     <div className={cn(
                       'px-4 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap',
-                      msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                        : 'bg-muted rounded-tl-sm',
+                      msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-sm' : 'bg-muted rounded-tl-sm',
                     )}>
                       {msg.content}
                     </div>
@@ -237,13 +217,8 @@ export function AiAssistant() {
                 </motion.div>
               ))}
 
-              {/* Loading dots */}
               {loading && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-2.5"
-                >
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2.5">
                   <div className="size-7 rounded-full bg-linear-to-br from-primary to-violet-600 text-white flex items-center justify-center shrink-0">
                     <Bot className="size-3.5" />
                   </div>
@@ -259,11 +234,10 @@ export function AiAssistant() {
                   </div>
                 </motion.div>
               )}
-
               <div ref={bottomRef} />
             </div>
 
-            {/* Quick suggestions — only on first message */}
+            {/* Quick suggestions */}
             {messages.length === 1 && !loading && (
               <div className="px-4 pb-2 shrink-0">
                 <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>

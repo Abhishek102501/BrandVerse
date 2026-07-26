@@ -43,9 +43,9 @@ const slideVariants = {
 }
 
 export function BrandGallery() {
-  const [current, setCurrent] = useState(0)
+  const [current, setCurrent]   = useState(0)
   const [direction, setDirection] = useState(1)
-  const [paused, setPaused] = useState(false)
+  const [paused, setPaused]     = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const go = useCallback((next: number, dir: number) => {
@@ -62,16 +62,18 @@ export function BrandGallery() {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [current, paused, go])
 
-  const brand = GALLERY_BRANDS[current]
+  const brand   = GALLERY_BRANDS[current]
   const palette = SLIDE_PALETTES[current % SLIDE_PALETTES.length]
 
   return (
     <section className="w-full">
+      {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 mb-4">
         <div>
-          <h2 className="font-display text-2xl md:text-3xl font-bold">Spotlight Brands</h2>
-          <p className="text-muted-foreground text-sm mt-0.5">Editor-curated picks you should know about</p>
+          <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-bold">Spotlight Brands</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">Editor-curated picks you should know about</p>
         </div>
+        {/* Dots */}
         <div className="flex items-center gap-1.5">
           {GALLERY_BRANDS.map((_, i) => (
             <button
@@ -87,9 +89,10 @@ export function BrandGallery() {
         </div>
       </div>
 
+      {/* Slide */}
       <div
         className="relative overflow-hidden rounded-2xl mx-4 md:mx-8 lg:mx-16"
-        style={{ height: 'clamp(260px, 38vw, 440px)' }}
+        style={{ height: 'clamp(220px, 45vw, 440px)' }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -103,83 +106,95 @@ export function BrandGallery() {
             exit="exit"
             className={cn('absolute inset-0 bg-linear-to-br flex items-center', palette.bg)}
           >
+            {/* Decorative circles */}
             <div className="absolute -top-20 -right-20 size-72 rounded-full bg-white/5" />
             <div className="absolute -bottom-16 -left-16 size-56 rounded-full bg-white/5" />
-            <div className="absolute top-1/2 right-1/4 size-32 rounded-full bg-white/5" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:32px_32px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-size-[32px_32px]" />
 
-            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 w-full px-8 md:px-12 lg:px-20">
+            <div className="relative z-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-8 md:gap-12 w-full px-6 sm:px-10 md:px-16 lg:px-20">
+
+              {/* Logo box — hidden on very small screens, shown on sm+ */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: -6 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15, duration: 0.5, type: 'spring', stiffness: 200 }}
-                className="shrink-0 bg-white rounded-2xl shadow-2xl flex items-center justify-center"
-                style={{ width: 'clamp(100px, 16vw, 180px)', height: 'clamp(100px, 16vw, 180px)' }}
+                className="hidden sm:flex shrink-0 bg-white rounded-2xl shadow-2xl items-center justify-center"
+                style={{ width: 'clamp(80px, 14vw, 160px)', height: 'clamp(80px, 14vw, 160px)' }}
               >
                 <img
                   src={brand.logoUrl}
                   alt={brand.name}
                   className="object-contain"
-                  style={{ maxWidth: '70%', maxHeight: '70%' }}
-                  onError={(e) => {
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(brand.name)}&size=128&background=6d28d9&color=fff&bold=true`
-                  }}
+                  style={{ maxWidth: '75%', maxHeight: '75%' }}
                 />
               </motion.div>
 
+              {/* Text */}
               <motion.div
-                initial={{ opacity: 0, x: 30 }}
+                initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2, duration: 0.45 }}
-                className="flex-1 text-white min-w-0"
+                className="flex-1 text-white min-w-0 w-full"
               >
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className={cn('text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full', palette.badge)}>
+                {/* Tags */}
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                  <span className={cn('text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full', palette.badge)}>
                     {brand.category}
                   </span>
                   {brand.sustainabilityScore >= 80 && (
-                    <span className="text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/20 text-white">
-                      🌿 Eco-friendly
+                    <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/20">
+                      🌿 Eco
                     </span>
                   )}
                   {brand.popularity >= 85 && (
-                    <span className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded-full bg-white/20 text-white">
-                      <TrendingUp className="size-3" /> Trending
+                    <span className="flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full bg-white/20">
+                      <TrendingUp className="size-2.5" /> Trending
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-display font-bold text-white leading-tight mb-2"
-                  style={{ fontSize: 'clamp(1.6rem, 4vw, 2.8rem)' }}>
+                {/* Brand name */}
+                <h3
+                  className="font-display font-bold text-white leading-tight mb-1.5 truncate"
+                  style={{ fontSize: 'clamp(1.4rem, 6vw, 2.8rem)' }}
+                >
                   {brand.name}
                 </h3>
 
-                <p className="text-white/80 leading-relaxed mb-4 line-clamp-2"
-                  style={{ fontSize: 'clamp(0.8rem, 1.5vw, 1rem)', maxWidth: '520px' }}>
+                {/* Description — hidden on mobile */}
+                <p
+                  className="hidden sm:block text-white/80 leading-relaxed mb-3 line-clamp-2"
+                  style={{ fontSize: 'clamp(0.75rem, 1.5vw, 1rem)', maxWidth: '520px' }}
+                >
                   {brand.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 mb-5">
-                  <div className="flex items-center gap-1.5">
-                    <Star className="size-4 fill-amber-300 text-amber-300" />
+                {/* Stats */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4">
+                  <div className="flex items-center gap-1">
+                    <Star className="size-3.5 fill-amber-300 text-amber-300" />
                     <span className="font-bold text-white text-sm">{formatRating(brand.rating)}</span>
-                    <span className="text-white/60 text-xs">({(brand.reviewsCount / 1000).toFixed(1)}k reviews)</span>
+                    <span className="text-white/60 text-xs hidden sm:inline">({(brand.reviewsCount / 1000).toFixed(1)}k)</span>
                   </div>
-                  <div className="w-px h-4 bg-white/20" />
-                  <span className="text-white/80 text-sm">{brand.country}</span>
-                  <div className="w-px h-4 bg-white/20" />
-                  <span className="text-white/80 text-sm capitalize">{PRICE_LABELS[brand.priceRange] ?? brand.priceRange}</span>
+                  <div className="w-px h-3 bg-white/20 hidden sm:block" />
+                  <span className="text-white/80 text-xs sm:text-sm">{brand.country}</span>
+                  <div className="w-px h-3 bg-white/20 hidden sm:block" />
+                  <span className="text-white/80 text-xs sm:text-sm capitalize hidden sm:inline">
+                    {PRICE_LABELS[brand.priceRange] ?? brand.priceRange}
+                  </span>
                 </div>
 
+                {/* CTA */}
                 <Link
                   to={brandDetailPath(brand.slug)}
-                  className="inline-flex items-center gap-2 bg-white text-gray-900 font-semibold rounded-xl px-5 py-2.5 text-sm hover:bg-white/90 transition-colors shadow-lg"
+                  className="inline-flex items-center gap-2 bg-white text-gray-900 font-semibold rounded-xl px-4 py-2 text-sm hover:bg-white/90 transition-colors shadow-lg"
                 >
                   View Brand <ChevronRight className="size-4" />
                 </Link>
               </motion.div>
             </div>
 
+            {/* Progress bar */}
             {!paused && (
               <motion.div
                 key={`progress-${brand.id}`}
@@ -192,16 +207,24 @@ export function BrandGallery() {
           </motion.div>
         </AnimatePresence>
 
-        <button onClick={prev} aria-label="Previous slide"
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all hover:scale-110">
-          <ChevronLeft className="size-5" />
+        {/* Arrows */}
+        <button
+          onClick={prev}
+          aria-label="Previous"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-1.5 sm:p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
+        >
+          <ChevronLeft className="size-4 sm:size-5" />
         </button>
-        <button onClick={next} aria-label="Next slide"
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all hover:scale-110">
-          <ChevronRight className="size-5" />
+        <button
+          onClick={next}
+          aria-label="Next"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-1.5 sm:p-2 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-sm transition-all"
+        >
+          <ChevronRight className="size-4 sm:size-5" />
         </button>
 
-        <div className="absolute bottom-4 right-4 z-20 text-white/70 text-xs font-medium tabular-nums">
+        {/* Counter */}
+        <div className="absolute bottom-3 right-3 z-20 text-white/70 text-xs font-medium tabular-nums">
           {current + 1} / {GALLERY_BRANDS.length}
         </div>
       </div>
