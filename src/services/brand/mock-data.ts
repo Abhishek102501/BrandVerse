@@ -1,308 +1,381 @@
 import type { Brand, BrandCategory } from './brand.types'
 
-/**
- * In-memory sample data. Shapes match exactly what the future Spring Boot API
- * is expected to return, so swapping the service implementation is transparent.
- */
 export const mockCategories: BrandCategory[] = [
-  { id: 'c1', name: 'Streetwear', slug: 'streetwear', description: 'Bold, culture-driven everyday fashion.', brandCount: 3 },
-  { id: 'c2', name: 'Minimalist', slug: 'minimalist', description: 'Clean lines and considered basics.', brandCount: 2 },
-  { id: 'c3', name: 'Sustainable', slug: 'sustainable', description: 'Low-impact materials and ethical supply chains.', brandCount: 2 },
-  { id: 'c4', name: 'Athleisure', slug: 'athleisure', description: 'Performance wear built for real life.', brandCount: 1 },
-  { id: 'c5', name: 'Luxury', slug: 'luxury', description: 'Exclusive, high-end fashion and craftsmanship.', brandCount: 2 },
-  { id: 'c6', name: 'Vintage', slug: 'vintage', description: 'Curated secondhand and heritage pieces.', brandCount: 1 },
+  { id: 'c1', name: 'Streetwear',  slug: 'streetwear',  description: 'Bold, culture-driven everyday fashion.',          brandCount: 20 },
+  { id: 'c2', name: 'Minimalist',  slug: 'minimalist',  description: 'Clean lines and considered basics.',              brandCount: 12 },
+  { id: 'c3', name: 'Sustainable', slug: 'sustainable', description: 'Low-impact materials and ethical supply chains.', brandCount: 10 },
+  { id: 'c4', name: 'Athleisure',  slug: 'athleisure',  description: 'Performance wear built for real life.',          brandCount: 15 },
+  { id: 'c5', name: 'Luxury',      slug: 'luxury',      description: 'Exclusive high-end fashion and craftsmanship.',  brandCount: 12 },
+  { id: 'c6', name: 'Ethnic',      slug: 'ethnic',      description: 'Traditional and festive wear from South Asia.',  brandCount: 12 },
 ]
 
-/** Tag for editorial picks — use this to mark brands featured in editor selection */
 export const editorPickTag = '__editor_pick__'
 
+const L: Record<string, string> = {
+  // ── GLOBAL ──────────────────────────────────────────────────────────────
+  nike:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 140'><path d='M28 105 Q130 18 272 48 Q245 64 72 98 Q44 107 28 105Z' fill='%23111'/></svg>`,
+
+  adidas:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 180'><polygon points='100,12 70,80 84,80 100,46 116,80 130,80' fill='%23111'/><rect x='58' y='94' width='84' height='12' fill='%23111'/><rect x='42' y='116' width='116' height='12' fill='%23111'/><rect x='26' y='138' width='148' height='12' fill='%23111'/></svg>`,
+
+  zara:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text y='64' font-family='Georgia,serif' font-size='70' font-weight='700' fill='%23111' letter-spacing='-2'>ZARA</text></svg>`,
+
+  hm:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 100'><rect width='180' height='100' fill='%23E50010'/><text x='90' y='68' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='white'>H%26M</text></svg>`,
+
+  gucci:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 100'><circle cx='76' cy='50' r='28' fill='none' stroke='%23111' stroke-width='6'/><path d='M76 50h18v10H76' fill='none' stroke='%23111' stroke-width='6'/><circle cx='144' cy='50' r='28' fill='none' stroke='%23C8A96E' stroke-width='6'/><path d='M144 50h-18v10h18' fill='none' stroke='%23C8A96E' stroke-width='6'/></svg>`,
+
+  louisvuitton:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><text x='100' y='58' text-anchor='middle' font-family='Times New Roman,serif' font-size='54' font-weight='700' fill='%23C8A96E'>LV</text><text x='100' y='82' text-anchor='middle' font-family='Times New Roman,serif' font-size='10' fill='%23111' letter-spacing='3'>LOUIS VUITTON</text></svg>`,
+
+  supreme:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' rx='3' fill='%23FF0000'/><text x='120' y='60' text-anchor='middle' font-family='Arial,sans-serif' font-size='34' font-weight='700' fill='white' letter-spacing='1'>SUPREME</text></svg>`,
+
+  offwhite:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='36' font-weight='700' fill='%23111' letter-spacing='2'>OFF-WHITE%E2%84%A2</text></svg>`,
+
+  patagonia:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 80'><text x='8' y='58' font-family='Arial Black,sans-serif' font-size='44' font-weight='900' fill='%23111'>PATAGONIA</text></svg>`,
+
+  levis:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' rx='3' fill='%23C41230'/><text x='100' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='40' font-weight='900' fill='white'>LEVI'S</text></svg>`,
+
+  uniqlo:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23FF0000'/><text x='120' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='42' font-weight='900' fill='white' letter-spacing='2'>UNIQLO</text></svg>`,
+
+  puma:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'><path d='M55 138 L76 88 Q84 66 102 74 L128 100 Q138 110 128 118 L110 112 L94 138Z' fill='%23111'/><path d='M102 74 Q118 58 130 64 Q122 80 128 100' fill='none' stroke='%23111' stroke-width='8' stroke-linecap='round'/><text x='100' y='156' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='18' font-weight='900' fill='%23111'>PUMA</text></svg>`,
+
+  ralphlauren:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><ellipse cx='75' cy='68' rx='26' ry='14' fill='none' stroke='%23111' stroke-width='2.5'/><circle cx='75' cy='44' r='9' fill='%23111'/><line x1='75' y1='53' x2='75' y2='74' stroke='%23111' stroke-width='2.5'/><line x1='75' y1='60' x2='63' y2='70' stroke='%23111' stroke-width='2.5'/><line x1='75' y1='60' x2='88' y2='54' stroke='%23111' stroke-width='2.5'/><line x1='75' y1='74' x2='69' y2='90' stroke='%23111' stroke-width='2.5'/><line x1='75' y1='74' x2='81' y2='90' stroke='%23111' stroke-width='2.5'/><line x1='88' y1='54' x2='108' y2='46' stroke='%23111' stroke-width='2.5'/><text x='115' y='75' font-family='serif' font-size='9' fill='%23111' letter-spacing='1'>RALPH</text><text x='115' y='88' font-family='serif' font-size='9' fill='%23111' letter-spacing='1'>LAUREN</text></svg>`,
+
+  everlane:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'><text x='8' y='58' font-family='Georgia,serif' font-size='44' fill='%23111' letter-spacing='3'>EVERLANE</text></svg>`,
+
+  stoneisland:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect x='18' y='10' width='58' height='58' rx='3' fill='%23111'/><text x='47' y='50' text-anchor='middle' font-family='Arial,sans-serif' font-size='26' font-weight='900' fill='white'>SI</text><text x='90' y='38' font-family='Arial,sans-serif' font-size='10' font-weight='700' fill='%23111' letter-spacing='1'>STONE</text><text x='90' y='52' font-family='Arial,sans-serif' font-size='10' font-weight='700' fill='%23111' letter-spacing='1'>ISLAND</text></svg>`,
+
+  reformation:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 80'><text x='8' y='56' font-family='Georgia,serif' font-size='38' fill='%23111' letter-spacing='3'>REFORMATION</text></svg>`,
+
+  newbalance:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><text x='100' y='74' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='68' font-weight='900' fill='%23CF0A2C'>N</text><text x='100' y='96' text-anchor='middle' font-family='Arial,sans-serif' font-size='11' font-weight='700' fill='%23111' letter-spacing='2'>NEW BALANCE</text></svg>`,
+
+  converse:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><polygon points='100,18 109,44 136,44 115,59 123,84 100,69 77,84 85,59 64,44 91,44' fill='%23111'/><line x1='36' y1='90' x2='164' y2='90' stroke='%23111' stroke-width='3'/><text x='100' y='110' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='14' font-weight='900' fill='%23111' letter-spacing='1'>CONVERSE</text></svg>`,
+
+  vans:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23111'/><text x='100' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='50' font-weight='900' fill='white' letter-spacing='2'>VANS</text></svg>`,
+
+  balenciaga:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 380 80'><text x='8' y='54' font-family='Arial,sans-serif' font-size='36' font-weight='300' fill='%23111' letter-spacing='4'>BALENCIAGA</text></svg>`,
+
+  versace:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><circle cx='100' cy='48' r='36' fill='none' stroke='%23C8A96E' stroke-width='3'/><circle cx='100' cy='48' r='26' fill='%23C8A96E'/><text x='100' y='56' text-anchor='middle' font-family='serif' font-size='24' font-weight='700' fill='%23111'>V</text><text x='100' y='104' text-anchor='middle' font-family='serif' font-size='14' font-weight='700' fill='%23111' letter-spacing='3'>VERSACE</text></svg>`,
+
+  prada:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><polygon points='100,18 142,82 58,82' fill='none' stroke='%23111' stroke-width='4'/><text x='100' y='108' text-anchor='middle' font-family='serif' font-size='22' font-weight='700' fill='%23111' letter-spacing='5'>PRADA</text></svg>`,
+
+  burberry:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><text x='100' y='46' text-anchor='middle' font-family='serif' font-size='14' fill='%23111' letter-spacing='2'>BURBERRY</text><line x1='28' y1='54' x2='172' y2='54' stroke='%23111' stroke-width='1'/><text x='100' y='72' text-anchor='middle' font-family='serif' font-size='10' fill='%23111' letter-spacing='1'>LONDON ENGLAND</text></svg>`,
+
+  champion:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><path d='M134 28 A52 52 0 1 0 134 92 L120 92 A38 38 0 1 1 120 28Z' fill='%23E31937'/><text x='100' y='108' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='14' font-weight='900' fill='%23111' letter-spacing='2'>CHAMPION</text></svg>`,
+
+  tommyhilfiger:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect x='28' y='18' width='52' height='56' fill='%23CC0000'/><rect x='80' y='18' width='26' height='56' fill='white' stroke='%23ddd' stroke-width='1'/><rect x='106' y='18' width='52' height='56' fill='%230C2D6B'/><text x='100' y='98' text-anchor='middle' font-family='Arial,sans-serif' font-size='8' font-weight='700' fill='%23111' letter-spacing='1'>TOMMY HILFIGER</text></svg>`,
+
+  calvinklein:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><text x='100' y='70' text-anchor='middle' font-family='Arial,sans-serif' font-size='54' font-weight='300' fill='%23111' letter-spacing='-2'>CK</text><text x='100' y='96' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' font-weight='300' fill='%23111' letter-spacing='3'>CALVIN KLEIN</text></svg>`,
+
+  lacoste:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><path d='M38 62 Q48 40 68 46 Q78 30 94 40 Q110 30 116 48 Q130 42 136 56 Q146 50 150 62 Q142 74 126 66 Q118 76 104 70 Q94 82 78 72 Q62 80 52 70 Q38 74 38 62Z' fill='%2300A550'/><text x='100' y='104' text-anchor='middle' font-family='Arial,sans-serif' font-size='13' font-weight='700' fill='%23111' letter-spacing='3'>LACOSTE</text></svg>`,
+
+  diesel:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23E8000D'/><text x='120' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='46' font-weight='900' fill='white' letter-spacing='1'>DIESEL</text></svg>`,
+
+  underarmour:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><path d='M56 82 Q56 28 100 28 Q144 28 144 82' fill='none' stroke='%23C8102E' stroke-width='14' stroke-linecap='round'/><path d='M74 82 Q74 48 100 48 Q126 48 126 82' fill='none' stroke='%23C8102E' stroke-width='14' stroke-linecap='round'/><text x='100' y='104' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' font-weight='700' fill='%23111' letter-spacing='2'>UNDER ARMOUR</text></svg>`,
+
+  reebok:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><text x='8' y='65' font-family='Arial Black,sans-serif' font-size='50' font-weight='900' fill='%23CF0A2C' letter-spacing='-1'>Reebok</text></svg>`,
+
+  fila:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23003087'/><text x='100' y='66' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='58' font-weight='900' fill='white'>FILA</text></svg>`,
+
+  asics:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 90'><text x='8' y='65' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='%23003DA5' letter-spacing='-1'>ASICS</text></svg>`,
+
+  lululemon:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><path d='M100 22 C64 22 38 46 38 72 C38 88 48 100 64 100 C76 100 84 92 84 83 C84 75 78 70 70 70 C78 65 88 60 100 60 C112 60 122 65 130 70 C122 70 116 75 116 83 C116 92 124 100 136 100 C152 100 162 88 162 72 C162 46 136 22 100 22Z' fill='%23E31837'/><text x='100' y='108' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' font-weight='700' fill='%23111' letter-spacing='1'>LULULEMON</text></svg>`,
+
+  arcteryx:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><ellipse cx='100' cy='40' rx='20' ry='9' fill='%23111'/><path d='M80 40 L28 78 M120 40 L172 78' stroke='%23111' stroke-width='5' stroke-linecap='round'/><path d='M80 40 L54 74 M120 40 L146 74' stroke='%23111' stroke-width='3' stroke-linecap='round'/><text x='100' y='100' text-anchor='middle' font-family='Arial,sans-serif' font-size='11' font-weight='700' fill='%23111' letter-spacing='2'>ARC'TERYX</text></svg>`,
+
+  thenorthface:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><path d='M38 76 L100 18 L162 76Z' fill='none' stroke='%23CC0000' stroke-width='5'/><path d='M66 76 A34 34 0 0 1 134 76' fill='%23CC0000'/><text x='100' y='100' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='9' font-weight='900' fill='%23111' letter-spacing='1'>THE NORTH FACE</text></svg>`,
+
+  timberland:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><polygon points='100,14 132,52 118,52 140,82 60,82 82,52 68,52' fill='%23FFDA00'/><rect x='94' y='82' width='12' height='16' fill='%23FFDA00'/><text x='100' y='106' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='10' font-weight='900' fill='%23111' letter-spacing='1'>TIMBERLAND</text></svg>`,
+
+  drmartens:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23FFDA00'/><text x='120' y='56' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='26' font-weight='900' fill='%23111'>Dr. Martens</text></svg>`,
+
+  carhartt:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23F5A800'/><text x='120' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='34' font-weight='900' fill='%23111' letter-spacing='1'>CARHARTT</text></svg>`,
+
+  stussy:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><text x='16' y='66' font-family='Georgia,serif' font-size='48' font-weight='700' fill='%23111' letter-spacing='-1'>Stüssy</text></svg>`,
+
+  palace:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><polygon points='100,14 172,86 28,86' fill='none' stroke='%23111' stroke-width='5'/><polygon points='100,34 150,86 50,86' fill='none' stroke='%23111' stroke-width='3'/><polygon points='100,54 128,86 72,86' fill='none' stroke='%23111' stroke-width='2'/><text x='100' y='104' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='13' font-weight='900' fill='%23111' letter-spacing='3'>PALACE</text></svg>`,
+
+  kith:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><text x='16' y='62' font-family='Arial,sans-serif' font-size='52' font-weight='300' fill='%23111' letter-spacing='8'>KITH</text></svg>`,
+
+  bape:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120'><circle cx='100' cy='50' r='40' fill='%23111'/><circle cx='86' cy='42' r='8' fill='white'/><circle cx='114' cy='42' r='8' fill='white'/><circle cx='86' cy='42' r='4' fill='%23111'/><circle cx='114' cy='42' r='4' fill='%23111'/><path d='M82 64 Q100 74 118 64' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/><text x='100' y='108' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='12' font-weight='900' fill='%23111' letter-spacing='1'>A BATHING APE</text></svg>`,
+
+  acnestudios:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='34' font-weight='300' fill='%23111' letter-spacing='5'>ACNE STUDIOS</text></svg>`,
+
+  cos:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 80'><text x='8' y='62' font-family='Arial,sans-serif' font-size='58' font-weight='300' fill='%23111' letter-spacing='8'>COS</text></svg>`,
+
+  pangaia:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='40' font-weight='700' fill='%2300704A' letter-spacing='3'>PANGAIA</text></svg>`,
+
+  veja:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 80'><text x='8' y='62' font-family='Arial Black,sans-serif' font-size='58' font-weight='900' fill='%23111' letter-spacing='1'>VEJA</text></svg>`,
+
+  nudiejeans:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='50' font-family='Georgia,serif' font-size='28' font-weight='700' fill='%23111' letter-spacing='2'>NUDIE JEANS</text><text x='8' y='68' font-family='Arial,sans-serif' font-size='10' fill='%23555' letter-spacing='1'>CO. ORGANIC DENIM</text></svg>`,
+
+  toteme:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='58' font-family='Georgia,serif' font-size='46' font-weight='400' fill='%23111' letter-spacing='4'>TOTEME</text></svg>`,
+
+  // ── INDIA ───────────────────────────────────────────────────────────────
+  fabindia:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%238B1A1A'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='36' font-weight='700' fill='%23F5C842' letter-spacing='2'>FabIndia</text><text x='120' y='76' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' fill='%23F5C842' letter-spacing='2'>CELEBRATE INDIA</text></svg>`,
+
+  manyavar:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23800020'/><text x='120' y='58' text-anchor='middle' font-family='Georgia,serif' font-size='32' font-weight='700' fill='%23F5C842' letter-spacing='2'>MANYAVAR</text><line x1='30' y1='68' x2='210' y2='68' stroke='%23F5C842' stroke-width='1'/><text x='120' y='82' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23F5C842' letter-spacing='3'>INDIA'S NO.1</text></svg>`,
+
+  biba:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect width='200' height='110' fill='%23E8007A'/><text x='100' y='68' text-anchor='middle' font-family='Georgia,serif' font-size='48' font-weight='700' fill='white' letter-spacing='2'>BIBA</text></svg>`,
+
+  wforwoman:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect width='200' height='110' fill='%23222'/><text x='100' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='56' font-weight='900' fill='white'>W</text><text x='100' y='82' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' fill='%23aaa' letter-spacing='2'>FOR WOMAN</text></svg>`,
+
+  allensolly:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23003366'/><text x='120' y='56' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='700' fill='white' letter-spacing='2'>ALLEN SOLLY</text><line x1='30' y1='66' x2='210' y2='66' stroke='%23F5C842' stroke-width='2'/><text x='120' y='84' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' fill='%23F5C842' letter-spacing='2'>FRIDAY DRESSING</text></svg>`,
+
+  raymond:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 110'><rect width='220' height='110' fill='%23111'/><text x='110' y='58' text-anchor='middle' font-family='Georgia,serif' font-size='36' font-weight='700' fill='white' letter-spacing='3'>RAYMOND</text><text x='110' y='80' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23aaa' letter-spacing='2'>THE COMPLETE MAN</text></svg>`,
+
+  vanheusen:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%230A2463'/><text x='120' y='56' text-anchor='middle' font-family='Arial,sans-serif' font-size='22' font-weight='700' fill='white' letter-spacing='3'>VAN HEUSEN</text><line x1='30' y1='65' x2='210' y2='65' stroke='white' stroke-width='0.5'/><text x='120' y='82' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23ccc' letter-spacing='2'>LIFESTYLE BRAND</text></svg>`,
+
+  peterpengland:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23003153'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='22' font-weight='700' fill='white' letter-spacing='2'>PETER ENGLAND</text><line x1='30' y1='62' x2='210' y2='62' stroke='%23F5C842' stroke-width='1.5'/><text x='120' y='80' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23F5C842' letter-spacing='2'>BRITAIN'S FINEST</text></svg>`,
+
+  aurelia:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 110'><rect width='220' height='110' fill='%23B5451B'/><text x='110' y='62' text-anchor='middle' font-family='Georgia,serif' font-size='36' font-weight='700' fill='white' letter-spacing='3'>AURELIA</text></svg>`,
+
+  globaldesi:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23FF6B35'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='26' font-weight='700' fill='white' letter-spacing='2'>GLOBAL DESI</text><text x='120' y='76' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' fill='white' letter-spacing='1'>BY ANITA DONGRE</text></svg>`,
+
+  sabyasachi:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23F5ECD7'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='22' font-weight='700' fill='%23800020' letter-spacing='2'>SABYASACHI</text><line x1='30' y1='62' x2='210' y2='62' stroke='%23800020' stroke-width='1'/><text x='120' y='80' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='%23800020' letter-spacing='2'>MUKHERJEE</text></svg>`,
+
+  montecarlo:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23002366'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='26' font-weight='700' fill='white' letter-spacing='2'>MONTE CARLO</text><text x='120' y='76' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23ccc' letter-spacing='2'>WOOLLENS &amp; MORE</text></svg>`,
+
+  // ── UK ──────────────────────────────────────────────────────────────────
+  nextuk:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23111'/><text x='100' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='white' letter-spacing='3'>NEXT</text></svg>`,
+
+  marksandspencer:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 90'><rect width='220' height='90' fill='%23009A44'/><text x='110' y='58' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='34' font-weight='900' fill='white' letter-spacing='1'>M%26S</text></svg>`,
+
+  topshop:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23111'/><text x='120' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='white' letter-spacing='2'>TOPSHOP</text></svg>`,
+
+  asos:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23111'/><text x='100' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='white' letter-spacing='2'>ASOS</text></svg>`,
+
+  // ── FRANCE ──────────────────────────────────────────────────────────────
+  hermes:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 110'><rect width='220' height='110' fill='%23F76F20'/><text x='110' y='56' text-anchor='middle' font-family='Georgia,serif' font-size='32' font-weight='700' fill='white' letter-spacing='4'>HERMÈS</text><line x1='28' y1='66' x2='192' y2='66' stroke='white' stroke-width='1'/><text x='110' y='82' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='white' letter-spacing='2'>PARIS</text></svg>`,
+
+  chanel:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><circle cx='86' cy='55' r='32' fill='none' stroke='%23111' stroke-width='5'/><circle cx='114' cy='55' r='32' fill='none' stroke='%23111' stroke-width='5'/><rect x='86' y='23' width='28' height='64' fill='white'/><text x='100' y='96' text-anchor='middle' font-family='Georgia,serif' font-size='13' font-weight='700' fill='%23111' letter-spacing='4'>CHANEL</text></svg>`,
+
+  saintlaurent:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='30' font-weight='300' fill='%23111' letter-spacing='5'>SAINT LAURENT</text></svg>`,
+
+  givenchy:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='34' font-weight='300' fill='%23111' letter-spacing='4'>GIVENCHY</text></svg>`,
+
+  // ── ITALY ───────────────────────────────────────────────────────────────
+  armani:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><text x='8' y='62' font-family='Arial,sans-serif' font-size='36' font-weight='300' fill='%23111' letter-spacing='5'>ARMANI</text></svg>`,
+
+  dolcegabbana:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80'><text x='8' y='42' font-family='Georgia,serif' font-size='26' font-weight='700' fill='%23111' letter-spacing='3'>DOLCE</text><text x='8' y='72' font-family='Georgia,serif' font-size='26' font-weight='700' fill='%23111' letter-spacing='1'>&amp;GABBANA</text></svg>`,
+
+  // ── GERMANY ─────────────────────────────────────────────────────────────
+  hugoboss:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 90'><rect width='220' height='90' fill='%23111'/><text x='110' y='58' text-anchor='middle' font-family='Arial,sans-serif' font-size='26' font-weight='300' fill='white' letter-spacing='5'>HUGO BOSS</text></svg>`,
+
+  // ── USA ─────────────────────────────────────────────────────────────────
+  gap:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect width='200' height='110' fill='%230B3D91'/><text x='100' y='72' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='64' font-weight='900' fill='white'>GAP</text></svg>`,
+
+  coach:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect width='200' height='110' fill='%23C8102E'/><text x='100' y='68' text-anchor='middle' font-family='Georgia,serif' font-size='42' font-weight='700' fill='white' letter-spacing='3'>COACH</text></svg>`,
+
+  michaelkors:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 80'><text x='8' y='56' font-family='Arial,sans-serif' font-size='28' font-weight='300' fill='%23111' letter-spacing='4'>MICHAEL KORS</text></svg>`,
+
+  katespade:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23111'/><text x='120' y='52' text-anchor='middle' font-family='Georgia,serif' font-size='28' font-weight='700' fill='white' letter-spacing='2'>kate spade</text><text x='120' y='74' text-anchor='middle' font-family='Arial,sans-serif' font-size='13' fill='white' letter-spacing='4'>new york</text></svg>`,
+
+  // ── JAPAN ───────────────────────────────────────────────────────────────
+  comme:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'><text x='8' y='50' font-family='Arial,sans-serif' font-size='14' font-weight='700' fill='%23111' letter-spacing='2'>COMME des GARÇONS</text></svg>`,
+
+  isseymiyake:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='54' font-family='Arial,sans-serif' font-size='28' font-weight='300' fill='%23111' letter-spacing='3'>ISSEY MIYAKE</text></svg>`,
+
+  // ── SPAIN ───────────────────────────────────────────────────────────────
+  mango:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 80'><text x='8' y='60' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='%23111' letter-spacing='1'>MANGO</text></svg>`,
+
+  // ── SWEDEN ──────────────────────────────────────────────────────────────
+  weekday:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80'><text x='8' y='58' font-family='Arial Black,sans-serif' font-size='40' font-weight='900' fill='%23111' letter-spacing='2'>WEEKDAY</text></svg>`,
+
+  // ── AUSTRALIA ───────────────────────────────────────────────────────────
+  countryroad:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 80'><text x='8' y='48' font-family='Georgia,serif' font-size='24' font-weight='400' fill='%23111' letter-spacing='3'>COUNTRY ROAD</text><line x1='8' y1='56' x2='252' y2='56' stroke='%23111' stroke-width='1'/></svg>`,
+
+  // ── NEW ADDITIONS ────────────────────────────────────────────────────────
+
+  // India
+  fabally:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23FF4081'/><text x='120' y='58' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='34' font-weight='900' fill='white' letter-spacing='1'>FabAlley</text></svg>`,
+
+  anita_dongre:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 110'><rect width='280' height='110' fill='%23F5ECD7'/><text x='140' y='48' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='700' fill='%23800020' letter-spacing='3'>ANITA DONGRE</text><line x1='30' y1='58' x2='250' y2='58' stroke='%23800020' stroke-width='1'/><text x='140' y='76' text-anchor='middle' font-family='Georgia,serif' font-size='11' fill='%23800020' letter-spacing='2'>LABEL</text></svg>`,
+
+  ritu_kumar:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%231a1a2e'/><text x='120' y='48' text-anchor='middle' font-family='Georgia,serif' font-size='20' font-weight='700' fill='%23C8A96E' letter-spacing='3'>RITU KUMAR</text><line x1='30' y1='58' x2='210' y2='58' stroke='%23C8A96E' stroke-width='1'/><text x='120' y='76' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='%23C8A96E' letter-spacing='2'>EST. 1969</text></svg>`,
+
+  wrogn:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 90'><rect width='220' height='90' fill='%23111'/><text x='110' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='44' font-weight='900' fill='%23FF4500' letter-spacing='2'>WROGN</text></svg>`,
+
+  hrx:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 90'><rect width='180' height='90' fill='%23E50010'/><text x='90' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='52' font-weight='900' fill='white' letter-spacing='2'>HRX</text></svg>`,
+
+  libas:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%234A0E8F'/><text x='100' y='60' text-anchor='middle' font-family='Georgia,serif' font-size='40' font-weight='700' fill='%23F5C842' letter-spacing='3'>LIBAS</text></svg>`,
+
+  // UK
+  ted_baker:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23111'/><text x='120' y='50' text-anchor='middle' font-family='Georgia,serif' font-size='18' font-weight='700' fill='white' letter-spacing='4'>TED BAKER</text><line x1='30' y1='60' x2='210' y2='60' stroke='white' stroke-width='0.5'/><text x='120' y='78' text-anchor='middle' font-family='Georgia,serif' font-size='10' fill='%23aaa' letter-spacing='2'>LONDON</text></svg>`,
+
+  allsaints:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 90'><rect width='240' height='90' fill='%23111'/><text x='120' y='58' text-anchor='middle' font-family='Arial,sans-serif' font-size='30' font-weight='700' fill='white' letter-spacing='3'>ALLSAINTS</text></svg>`,
+
+  reiss:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><text x='8' y='64' font-family='Arial,sans-serif' font-size='52' font-weight='300' fill='%23111' letter-spacing='4'>REISS</text></svg>`,
+
+  // France
+  ami:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 110'><circle cx='80' cy='48' r='36' fill='none' stroke='%23E31837' stroke-width='4'/><text x='80' y='58' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' font-weight='700' fill='%23E31837'>AMI</text><text x='80' y='96' text-anchor='middle' font-family='Arial,sans-serif' font-size='10' fill='%23111' letter-spacing='2'>PARIS</text></svg>`,
+
+  jacquemus:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 80'><text x='8' y='58' font-family='Arial,sans-serif' font-size='36' font-weight='300' fill='%23111' letter-spacing='3'>JACQUEMUS</text></svg>`,
+
+  // Italy
+  moncler:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 110'><rect width='220' height='110' fill='%23002F6C'/><text x='110' y='56' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='28' font-weight='900' fill='white' letter-spacing='2'>MONCLER</text><line x1='20' y1='66' x2='200' y2='66' stroke='%23F5C842' stroke-width='1.5'/><text x='110' y='82' text-anchor='middle' font-family='Arial,sans-serif' font-size='9' fill='%23F5C842' letter-spacing='2'>GRENOBLE 1952</text></svg>`,
+
+  maxmara:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 80'><text x='8' y='58' font-family='Times New Roman,serif' font-size='40' font-weight='700' fill='%23111' letter-spacing='4'>MAX MARA</text></svg>`,
+
+  // Germany
+  hugo:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 90'><rect width='180' height='90' fill='%23E8000D'/><text x='90' y='60' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='46' font-weight='900' fill='white' letter-spacing='2'>HUGO</text></svg>`,
+
+  // USA
+  polo:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 110'><rect width='200' height='110' fill='%230B3D91'/><text x='100' y='50' text-anchor='middle' font-family='serif' font-size='14' fill='white' letter-spacing='2'>POLO</text><text x='100' y='72' text-anchor='middle' font-family='serif' font-size='11' fill='%23F5C842' letter-spacing='1'>RALPH LAUREN</text></svg>`,
+
+  tory_burch:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 110'><rect width='240' height='110' fill='%23F5ECD7'/><circle cx='120' cy='44' r='22' fill='none' stroke='%23B5451B' stroke-width='3'/><text x='120' y='50' text-anchor='middle' font-family='serif' font-size='18' font-weight='700' fill='%23B5451B'>TB</text><text x='120' y='82' text-anchor='middle' font-family='serif' font-size='12' fill='%23B5451B' letter-spacing='2'>TORY BURCH</text></svg>`,
+
+  banana_republic:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 80'><text x='8' y='48' font-family='Arial,sans-serif' font-size='20' font-weight='300' fill='%23111' letter-spacing='4'>BANANA REPUBLIC</text><line x1='8' y1='56' x2='272' y2='56' stroke='%23111' stroke-width='0.8'/></svg>`,
+
+  // Japan
+  wtaps:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23111'/><text x='100' y='58' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='white' letter-spacing='2'>WTAPS</text></svg>`,
+
+  neighborhood:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 80'><text x='8' y='54' font-family='Arial Black,sans-serif' font-size='30' font-weight='900' fill='%23111' letter-spacing='1'>NEIGHBORHOOD</text></svg>`,
+
+  // Korea
+  ader_error:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 90'><rect width='260' height='90' fill='%23111'/><text x='130' y='56' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' font-weight='700' fill='white' letter-spacing='2'>ADER ERROR</text></svg>`,
+
+  // Portugal
+  salsa:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 90'><rect width='200' height='90' fill='%23D40000'/><text x='100' y='60' text-anchor='middle' font-family='Georgia,serif' font-size='38' font-weight='700' fill='white' letter-spacing='2'>SALSA</text></svg>`,
+
+  // Netherlands
+  scotch_soda:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 260 90'><rect width='260' height='90' fill='%23003DA5'/><text x='130' y='56' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='26' font-weight='900' fill='white' letter-spacing='1'>SCOTCH %26 SODA</text></svg>`,
+}
+
 export const mockBrands: Brand[] = [
-  {
-    id: 'b1',
-    name: 'Northwind',
-    slug: 'northwind',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Northwind',
-    description: 'Technical outerwear with a minimalist edge, made for the city and the trail.',
-    category: 'minimalist',
-    country: 'Sweden',
-    websiteUrl: 'https://example.com/northwind',
-    rating: 4.7,
-    reviewsCount: 12840,
-    popularity: 88,
-    sustainabilityScore: 82,
-    trustScore: 91,
-    priceRange: 'premium',
-    tags: ['outerwear', 'unisex', 'recycled', editorPickTag],
-    featured: true,
-  },
-  {
-    id: 'b2',
-    name: 'Halcyon',
-    slug: 'halcyon',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Halcyon',
-    description: 'Considered basics in organic cotton — the wardrobe you reach for daily.',
-    category: 'minimalist',
-    country: 'Japan',
-    websiteUrl: 'https://example.com/halcyon',
-    rating: 4.5,
-    reviewsCount: 8210,
-    popularity: 76,
-    sustainabilityScore: 90,
-    trustScore: 88,
-    priceRange: 'mid',
-    tags: ['basics', 'organic', 'everyday', editorPickTag],
-    featured: true,
-  },
-  {
-    id: 'b3',
-    name: 'Riot Society',
-    slug: 'riot-society',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Riot',
-    description: 'Graphic-led streetwear born from skate and music subcultures.',
-    category: 'streetwear',
-    country: 'USA',
-    websiteUrl: 'https://example.com/riot-society',
-    rating: 4.2,
-    reviewsCount: 15320,
-    popularity: 93,
-    sustainabilityScore: 54,
-    trustScore: 79,
-    priceRange: 'budget',
-    tags: ['graphic', 'skate', 'street'],
-    featured: true,
-  },
-  {
-    id: 'b4',
-    name: 'Terra & Thread',
-    slug: 'terra-and-thread',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Terra',
-    description: 'Regeneratively farmed fibres and full supply-chain transparency.',
-    category: 'sustainable',
-    country: 'India',
-    websiteUrl: 'https://example.com/terra-thread',
-    rating: 4.8,
-    reviewsCount: 6420,
-    popularity: 71,
-    sustainabilityScore: 97,
-    trustScore: 94,
-    priceRange: 'premium',
-    tags: ['regenerative', 'transparent', 'ethical', editorPickTag],
-    featured: true,
-  },
-  {
-    id: 'b5',
-    name: 'Atelier Nord',
-    slug: 'atelier-nord',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=AtelierNord',
-    description: 'Elevated streetwear with a luxury finish and limited drops.',
-    category: 'streetwear',
-    country: 'France',
-    websiteUrl: 'https://example.com/member-off',
-    rating: 4.4,
-    reviewsCount: 9870,
-    popularity: 85,
-    sustainabilityScore: 61,
-    trustScore: 83,
-    priceRange: 'luxury',
-    tags: ['limited', 'elevated', 'drops'],
-    featured: false,
-  },
-  {
-    id: 'b6',
-    name: 'Kinetic',
-    slug: 'kinetic',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Kinetic',
-    description: 'Performance athleisure engineered to move from gym to street.',
-    category: 'athleisure',
-    country: 'UK',
-    websiteUrl: 'https://example.com/kinetic',
-    rating: 4.3,
-    reviewsCount: 11250,
-    popularity: 80,
-    sustainabilityScore: 68,
-    trustScore: 82,
-    priceRange: 'mid',
-    tags: ['performance', 'active', 'stretch', editorPickTag],
-    featured: false,
-  },
-  {
-    id: 'b7',
-    name: 'Cedarline',
-    slug: 'cedarline',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=Cedarline',
-    description: 'Heritage-inspired staples in deadstock and low-impact fabrics.',
-    category: 'sustainable',
-    country: 'Canada',
-    websiteUrl: 'https://example.com/cedarline',
-    rating: 4.6,
-    reviewsCount: 5310,
-    popularity: 64,
-    sustainabilityScore: 89,
-    trustScore: 90,
-    priceRange: 'premium',
-    tags: ['heritage', 'deadstock', 'low-impact'],
-    featured: false,
-  },
-  {
-    id: 'b8',
-    name: 'Void Theory',
-    slug: 'void-theory',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=VoidTheory',
-    description: 'Monochrome streetwear silhouettes with an architectural sensibility.',
-    category: 'streetwear',
-    country: 'Germany',
-    websiteUrl: 'https://example.com/void-theory',
-    rating: 4.1,
-    reviewsCount: 7180,
-    popularity: 74,
-    sustainabilityScore: 58,
-    trustScore: 77,
-    priceRange: 'mid',
-    tags: ['monochrome', 'architectural', 'street'],
-    featured: false,
-  },
-  {
-    id: 'b9',
-    name: 'Apex Collective',
-    slug: 'apex-collective',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=ApexCollective',
-    description: 'Contemporary luxury menswear merging tailoring with street culture.',
-    category: 'luxury',
-    country: 'Italy',
-    websiteUrl: 'https://example.com/apex',
-    rating: 4.6,
-    reviewsCount: 4920,
-    popularity: 72,
-    sustainabilityScore: 65,
-    trustScore: 89,
-    priceRange: 'luxury',
-    tags: ['menswear', 'tailored', 'contemporary'],
-    featured: false,
-  },
-  {
-    id: 'b10',
-    name: 'Revive Vintage',
-    slug: 'revive-vintage',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=ReviveVintage',
-    description: 'Carefully curated vintage and secondhand collections with a modern eye.',
-    category: 'vintage',
-    country: 'USA',
-    websiteUrl: 'https://example.com/revive',
-    rating: 4.4,
-    reviewsCount: 3870,
-    popularity: 68,
-    sustainabilityScore: 95,
-    trustScore: 86,
-    priceRange: 'budget',
-    tags: ['vintage', 'secondhand', 'curated'],
-    featured: false,
-  },
-  {
-    id: 'b11',
-    name: 'Echo Studios',
-    slug: 'echo-studios',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=EchoStudios',
-    description: 'Artist-collaborative prints and limited edition apparel drops.',
-    category: 'streetwear',
-    country: 'Spain',
-    websiteUrl: 'https://example.com/echo',
-    rating: 4.3,
-    reviewsCount: 5680,
-    popularity: 79,
-    sustainabilityScore: 72,
-    trustScore: 81,
-    priceRange: 'mid',
-    tags: ['artist', 'limited', 'collaborative'],
-    featured: false,
-  },
-  {
-    id: 'b12',
-    name: 'Lumina Essentials',
-    slug: 'lumina-essentials',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=LuminaEssentials',
-    description: 'Timeless minimalist basics engineered for simplicity and quality.',
-    category: 'minimalist',
-    country: 'Switzerland',
-    websiteUrl: 'https://example.com/lumina',
-    rating: 4.7,
-    reviewsCount: 9210,
-    popularity: 81,
-    sustainabilityScore: 88,
-    trustScore: 93,
-    priceRange: 'premium',
-    tags: ['basics', 'timeless', 'quality'],
-    featured: true,
-  },
-  {
-    id: 'b13',
-    name: 'Flow Active',
-    slug: 'flow-active',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=FlowActive',
-    description: 'Sustainable activewear made from recycled ocean plastics.',
-    category: 'athleisure',
-    country: 'Netherlands',
-    websiteUrl: 'https://example.com/flow',
-    rating: 4.5,
-    reviewsCount: 7450,
-    popularity: 82,
-    sustainabilityScore: 96,
-    trustScore: 90,
-    priceRange: 'mid',
-    tags: ['activewear', 'sustainable', 'ocean-safe'],
-    featured: false,
-  },
-  {
-    id: 'b14',
-    name: 'Nova Factory',
-    slug: 'nova-factory',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=NovaFactory',
-    description: 'Experimental fashion lab pushing boundaries with innovative cuts.',
-    category: 'streetwear',
-    country: 'Belgium',
-    websiteUrl: 'https://example.com/nova',
-    rating: 4.2,
-    reviewsCount: 4310,
-    popularity: 76,
-    sustainabilityScore: 69,
-    trustScore: 78,
-    priceRange: 'premium',
-    tags: ['experimental', 'innovative', 'avant-garde'],
-    featured: false,
-  },
-  {
-    id: 'b15',
-    name: 'Zenith Heritage',
-    slug: 'zenith-heritage',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=ZenithHeritage',
-    description: 'Legacy brand preserving traditional craftsmanship with modern silhouettes.',
-    category: 'luxury',
-    country: 'Portugal',
-    websiteUrl: 'https://example.com/zenith',
-    rating: 4.8,
-    reviewsCount: 3210,
-    popularity: 62,
-    sustainabilityScore: 84,
-    trustScore: 96,
-    priceRange: 'luxury',
-    tags: ['heritage', 'craftsmanship', 'tradition'],
-    featured: false,
-  },
-  {
-    id: 'b16',
-    name: 'Pulse Metro',
-    slug: 'pulse-metro',
-    logoUrl: 'https://api.dicebear.com/9.x/initials/svg?seed=PulseMetro',
-    description: 'Urban commuter wear optimized for the modern city lifestyle.',
-    category: 'athleisure',
-    country: 'South Korea',
-    websiteUrl: 'https://example.com/pulse',
-    rating: 4.4,
-    reviewsCount: 8760,
-    popularity: 84,
-    sustainabilityScore: 77,
-    trustScore: 87,
-    priceRange: 'mid',
-    tags: ['urban', 'commuter', 'functional'],
-    featured: false,
-  },
+  // ── ATHLEISURE ──────────────────────────────────────────────────────────
+  { id:'b1',  name:'Nike',           slug:'nike',           logoUrl:L.nike,          description:"World's leading athletic brand. Iconic swoosh, performance innovation and culture-defining design since 1964.",                            category:'athleisure', country:'USA',       websiteUrl:'https://www.nike.com',              rating:4.7, reviewsCount:98000, popularity:99, sustainabilityScore:62, trustScore:95, priceRange:'mid',     tags:['sports','performance','iconic',editorPickTag],     featured:true  },
+  { id:'b2',  name:'Adidas',         slug:'adidas',         logoUrl:L.adidas,        description:'German sportswear giant known for iconic three stripes, top performance gear and timeless street style.',                                  category:'athleisure', country:'Germany',   websiteUrl:'https://www.adidas.com',            rating:4.6, reviewsCount:87000, popularity:97, sustainabilityScore:70, trustScore:93, priceRange:'mid',     tags:['sports','street','classic',editorPickTag],         featured:true  },
+  { id:'b3',  name:'Puma',           slug:'puma',           logoUrl:L.puma,          description:'German sportswear brand fusing athletic performance with street culture, bold design and celebrity collaborations.',                       category:'athleisure', country:'Germany',   websiteUrl:'https://www.puma.com',              rating:4.3, reviewsCount:44000, popularity:86, sustainabilityScore:63, trustScore:87, priceRange:'mid',     tags:['sports','street','performance'],                   featured:false },
+  { id:'b4',  name:'New Balance',    slug:'new-balance',    logoUrl:L.newbalance,    description:'Boston-born heritage athletic brand crafting precision footwear and apparel for athletes and style-conscious wearers.',                   category:'athleisure', country:'USA',       websiteUrl:'https://www.newbalance.com',        rating:4.5, reviewsCount:42000, popularity:88, sustainabilityScore:60, trustScore:88, priceRange:'mid',     tags:['athletic','heritage','running',editorPickTag],     featured:false },
+  { id:'b5',  name:'Under Armour',   slug:'under-armour',   logoUrl:L.underarmour,   description:'Baltimore-born performance apparel built on moisture-wicking fabric technology, now outfitting athletes at every level.',                 category:'athleisure', country:'USA',       websiteUrl:'https://www.underarmour.com',       rating:4.2, reviewsCount:36000, popularity:80, sustainabilityScore:58, trustScore:82, priceRange:'mid',     tags:['performance','athletic','tech'],                   featured:false },
+  { id:'b6',  name:'Reebok',         slug:'reebok',         logoUrl:L.reebok,        description:'British athletic heritage brand behind the aerobic fitness boom and iconic Classic Leather sneaker loved globally.',                       category:'athleisure', country:'UK',        websiteUrl:'https://www.reebok.com',            rating:4.1, reviewsCount:31000, popularity:78, sustainabilityScore:60, trustScore:80, priceRange:'mid',     tags:['athletic','heritage','sneakers'],                  featured:false },
+  { id:'b7',  name:'Fila',           slug:'fila',           logoUrl:L.fila,          description:'Italian-born sportswear label dating to 1911, rediscovered by a new generation for retro tennis and basketball aesthetics.',              category:'athleisure', country:'Italy',     websiteUrl:'https://www.fila.com',              rating:4.0, reviewsCount:24000, popularity:74, sustainabilityScore:55, trustScore:77, priceRange:'budget',  tags:['retro','athletic','italian'],                      featured:false },
+  { id:'b8',  name:'ASICS',          slug:'asics',          logoUrl:L.asics,         description:'Japanese performance running brand engineering shoes for serious athletes since 1949.',                                                     category:'athleisure', country:'Japan',     websiteUrl:'https://www.asics.com',             rating:4.4, reviewsCount:27000, popularity:79, sustainabilityScore:66, trustScore:86, priceRange:'mid',     tags:['running','japanese','performance'],                featured:false },
+  { id:'b9',  name:'Lululemon',      slug:'lululemon',      logoUrl:L.lululemon,     description:'Vancouver-born yoga and activewear brand that made technical athletic gear aspirational and built a community around movement.',           category:'athleisure', country:'Canada',    websiteUrl:'https://www.lululemon.com',         rating:4.6, reviewsCount:44000, popularity:88, sustainabilityScore:68, trustScore:89, priceRange:'premium', tags:['yoga','activewear','performance',editorPickTag],   featured:false },
+  { id:'b10', name:'Lacoste',        slug:'lacoste',        logoUrl:L.lacoste,       description:'French sportswear brand born on the tennis court in 1933, defined by its small green crocodile and clean piqué polo shirts.',             category:'athleisure', country:'France',    websiteUrl:'https://www.lacoste.com',           rating:4.3, reviewsCount:28000, popularity:81, sustainabilityScore:64, trustScore:85, priceRange:'mid',     tags:['tennis','french','sporty'],                        featured:false },
+
+  // ── STREETWEAR ──────────────────────────────────────────────────────────
+  { id:'b11', name:'Supreme',        slug:'supreme',        logoUrl:L.supreme,       description:'New York streetwear cult brand famous for limited weekly drops, skateboarding roots and unmatched cultural influence.',                   category:'streetwear', country:'USA',       websiteUrl:'https://www.supremenewyork.com',    rating:4.5, reviewsCount:52000, popularity:93, sustainabilityScore:40, trustScore:85, priceRange:'premium', tags:['streetwear','drops','skate',editorPickTag],        featured:true  },
+  { id:'b12', name:'Off-White',      slug:'off-white',      logoUrl:L.offwhite,      description:"Virgil Abloh's boundary-pushing label merging streetwear and high fashion with bold industrial aesthetics.",                              category:'streetwear', country:'Italy',     websiteUrl:'https://www.off---white.com',       rating:4.4, reviewsCount:29000, popularity:88, sustainabilityScore:44, trustScore:84, priceRange:'luxury',  tags:['streetwear','luxury','hype'],                      featured:false },
+  { id:'b13', name:"Levi's",         slug:'levis',          logoUrl:L.levis,         description:'The original American denim brand since 1853, crafting jeans and iconic workwear that define generations worldwide.',                     category:'streetwear', country:'USA',       websiteUrl:'https://www.levi.com',              rating:4.5, reviewsCount:61000, popularity:92, sustainabilityScore:65, trustScore:90, priceRange:'mid',     tags:['denim','classic','american'],                      featured:false },
+  { id:'b14', name:'Stone Island',   slug:'stone-island',   logoUrl:L.stoneisland,   description:'Italian research-driven brand pushing fabric innovation, garment dyeing and technical construction to new extremes.',                     category:'streetwear', country:'Italy',     websiteUrl:'https://www.stoneisland.com',       rating:4.6, reviewsCount:22000, popularity:84, sustainabilityScore:58, trustScore:88, priceRange:'luxury',  tags:['technical','italian','research'],                  featured:false },
+  { id:'b15', name:'Converse',       slug:'converse',       logoUrl:L.converse,      description:'The iconic American sneaker brand behind the Chuck Taylor — a century of cultural relevance from basketball courts to concert stages.',   category:'streetwear', country:'USA',       websiteUrl:'https://www.converse.com',          rating:4.4, reviewsCount:55000, popularity:91, sustainabilityScore:58, trustScore:87, priceRange:'budget',  tags:['sneakers','classic','street'],                     featured:false },
+  { id:'b16', name:'Vans',           slug:'vans',           logoUrl:L.vans,          description:'California-born skate and surf brand built on authentic creativity and the Off The Wall spirit since 1966.',                              category:'streetwear', country:'USA',       websiteUrl:'https://www.vans.com',              rating:4.4, reviewsCount:48000, popularity:89, sustainabilityScore:55, trustScore:86, priceRange:'budget',  tags:['skate','street','california'],                     featured:false },
+  { id:'b17', name:'Champion',       slug:'champion',       logoUrl:L.champion,      description:'Rochester-born activewear pioneer that invented the hoodie and reverse weave fleece, now a streetwear staple worldwide.',                 category:'streetwear', country:'USA',       websiteUrl:'https://www.champion.com',          rating:4.2, reviewsCount:38000, popularity:82, sustainabilityScore:58, trustScore:82, priceRange:'budget',  tags:['athletic','streetwear','classic'],                 featured:false },
+  { id:'b18', name:'Diesel',         slug:'diesel',         logoUrl:L.diesel,        description:'Rebellious Italian denim brand known for innovative washes, provocative campaigns and fashion as a form of protest.',                     category:'streetwear', country:'Italy',     websiteUrl:'https://www.diesel.com',            rating:4.1, reviewsCount:22000, popularity:76, sustainabilityScore:50, trustScore:78, priceRange:'premium', tags:['denim','italian','rebel'],                         featured:false },
+  { id:'b19', name:'Stüssy',         slug:'stussy',         logoUrl:L.stussy,        description:"Laguna Beach surf brand turned global streetwear pioneer — Shawn Stüssy's scrawled signature logo defined the streetwear template.",     category:'streetwear', country:'USA',       websiteUrl:'https://www.stussy.com',            rating:4.5, reviewsCount:26000, popularity:84, sustainabilityScore:52, trustScore:85, priceRange:'mid',     tags:['streetwear','surf','pioneer',editorPickTag],       featured:false },
+  { id:'b20', name:'Palace',         slug:'palace',         logoUrl:L.palace,        description:'London skate brand born under a railway arch, now a globally coveted label dropping limited gear every Friday at noon.',                  category:'streetwear', country:'UK',        websiteUrl:'https://www.palaceskateboards.com', rating:4.5, reviewsCount:18000, popularity:83, sustainabilityScore:48, trustScore:84, priceRange:'premium', tags:['skate','british','hype'],                          featured:false },
+  { id:'b21', name:'Kith',           slug:'kith',           logoUrl:L.kith,          description:'New York concept store turned luxury streetwear brand known for obsessive detail, premium materials and elite collaborations.',            category:'streetwear', country:'USA',       websiteUrl:'https://www.kith.com',              rating:4.4, reviewsCount:16000, popularity:80, sustainabilityScore:55, trustScore:83, priceRange:'premium', tags:['luxury','streetwear','collabs'],                   featured:false },
+  { id:'b22', name:'A Bathing Ape',  slug:'bape',           logoUrl:L.bape,          description:'Tokyo streetwear powerhouse founded by NIGO in 1993 — camo patterns and shark hoodies that defined Japanese street fashion.',            category:'streetwear', country:'Japan',     websiteUrl:'https://bape.com',                  rating:4.4, reviewsCount:20000, popularity:82, sustainabilityScore:45, trustScore:82, priceRange:'premium', tags:['japanese','streetwear','camo',editorPickTag],      featured:false },
+  { id:'b23', name:'Timberland',     slug:'timberland',     logoUrl:L.timberland,    description:'New Hampshire heritage brand behind the iconic yellow boot, combining rugged craftsmanship with urban street credibility.',               category:'streetwear', country:'USA',       websiteUrl:'https://www.timberland.com',        rating:4.3, reviewsCount:33000, popularity:80, sustainabilityScore:70, trustScore:84, priceRange:'mid',     tags:['boots','heritage','street'],                       featured:false },
+  { id:'b24', name:'Carhartt',       slug:'carhartt',       logoUrl:L.carhartt,      description:'Michigan workwear institution since 1889. Heavyweight canvas jackets that migrated from construction sites to runways.',                  category:'streetwear', country:'USA',       websiteUrl:'https://www.carhartt.com',          rating:4.6, reviewsCount:29000, popularity:82, sustainabilityScore:62, trustScore:88, priceRange:'mid',     tags:['workwear','heritage','durable'],                   featured:false },
+  { id:'b25', name:'Dr. Martens',    slug:'dr-martens',     logoUrl:L.drmartens,     description:"British boots born in Northamptonshire in 1960 — adopted by punks, skinheads and today's streetwear scene.",                            category:'streetwear', country:'UK',        websiteUrl:'https://www.drmartens.com',         rating:4.5, reviewsCount:38000, popularity:84, sustainabilityScore:60, trustScore:86, priceRange:'mid',     tags:['boots','british','subculture'],                    featured:false },
+  { id:'b26', name:'ASOS',           slug:'asos',           logoUrl:L.asos,          description:'British online fashion giant stocking thousands of brands alongside own-label collections for every style and occasion.',                 category:'streetwear', country:'UK',        websiteUrl:'https://www.asos.com',              rating:4.0, reviewsCount:72000, popularity:88, sustainabilityScore:50, trustScore:80, priceRange:'budget',  tags:['online','british','variety'],                      featured:false },
+  { id:'b27', name:'Weekday',        slug:'weekday',        logoUrl:L.weekday,       description:'Swedish denim-focused brand with a strong editorial identity, offering stylish pieces with a progressive attitude.',                      category:'streetwear', country:'Sweden',    websiteUrl:'https://www.weekday.com',           rating:4.2, reviewsCount:14000, popularity:72, sustainabilityScore:68, trustScore:80, priceRange:'budget',  tags:['denim','scandinavian','editorial'],                featured:false },
+  { id:'b28', name:'Mango',          slug:'mango',          logoUrl:L.mango,         description:'Barcelona-born fashion brand delivering Mediterranean style through trend-led collections for women, men and kids.',                      category:'streetwear', country:'Spain',     websiteUrl:'https://www.mango.com',             rating:4.1, reviewsCount:38000, popularity:82, sustainabilityScore:55, trustScore:80, priceRange:'budget',  tags:['spanish','trendy','accessible'],                   featured:false },
+
+  // ── MINIMALIST ──────────────────────────────────────────────────────────
+  { id:'b29', name:'Zara',           slug:'zara',           logoUrl:L.zara,          description:"Spain's fast fashion powerhouse delivering runway-inspired looks at accessible prices with rapid trend turnaround.",                       category:'minimalist', country:'Spain',     websiteUrl:'https://www.zara.com',              rating:4.2, reviewsCount:72000, popularity:94, sustainabilityScore:45, trustScore:82, priceRange:'budget',  tags:['fast-fashion','trendy','affordable'],               featured:true  },
+  { id:'b30', name:'H&M',            slug:'hm',             logoUrl:L.hm,            description:'Swedish retailer offering fashion-forward basics and conscious collections at every price point for all ages.',                           category:'minimalist', country:'Sweden',    websiteUrl:'https://www.hm.com',                rating:4.0, reviewsCount:65000, popularity:91, sustainabilityScore:55, trustScore:80, priceRange:'budget',  tags:['basics','affordable','conscious'],                 featured:false },
+  { id:'b31', name:'Uniqlo',         slug:'uniqlo',         logoUrl:L.uniqlo,        description:'Japanese retailer mastering LifeWear — simple, high-quality everyday clothing made for everyone at honest prices.',                      category:'minimalist', country:'Japan',     websiteUrl:'https://www.uniqlo.com',            rating:4.6, reviewsCount:58000, popularity:90, sustainabilityScore:72, trustScore:91, priceRange:'budget',  tags:['basics','japanese','quality',editorPickTag],       featured:false },
+  { id:'b32', name:'Calvin Klein',   slug:'calvin-klein',   logoUrl:L.calvinklein,   description:'New York minimalism at its finest — CK revolutionised denim, underwear and fragrance with clean lines and bold advertising.',             category:'minimalist', country:'USA',       websiteUrl:'https://www.calvinklein.com',       rating:4.3, reviewsCount:35000, popularity:85, sustainabilityScore:58, trustScore:85, priceRange:'mid',     tags:['minimalist','denim','underwear'],                  featured:false },
+  { id:'b33', name:'Tommy Hilfiger', slug:'tommy-hilfiger', logoUrl:L.tommyhilfiger, description:"America's classic preppy brand with nautical flair, flag-inspired colorblocking and enduring all-American optimism.",                     category:'minimalist', country:'USA',       websiteUrl:'https://www.tommy.com',             rating:4.2, reviewsCount:32000, popularity:83, sustainabilityScore:60, trustScore:83, priceRange:'mid',     tags:['preppy','american','classic'],                     featured:false },
+  { id:'b34', name:'COS',            slug:'cos',            logoUrl:L.cos,           description:"H&M Group's elevated minimalist label offering considered silhouettes and quality basics inspired by art and architecture.",               category:'minimalist', country:'UK',        websiteUrl:'https://www.cos.com',               rating:4.4, reviewsCount:21000, popularity:76, sustainabilityScore:70, trustScore:85, priceRange:'mid',     tags:['minimalist','architectural','quality'],            featured:false },
+  { id:'b35', name:'Toteme',         slug:'toteme',         logoUrl:L.toteme,        description:'Swedish brand offering effortlessly elegant basics in natural fabrics — the uniform of the quietly confident.',                           category:'minimalist', country:'Sweden',    websiteUrl:'https://www.toteme-studio.com',     rating:4.6, reviewsCount:9000,  popularity:72, sustainabilityScore:75, trustScore:88, priceRange:'premium', tags:['scandinavian','quiet-luxury','basics',editorPickTag],featured:false},
+  { id:'b36', name:'Acne Studios',   slug:'acne-studios',   logoUrl:L.acnestudios,   description:'Stockholm creative collective turned Scandi luxury powerhouse, known for distinctive pink label and conceptual runway work.',             category:'minimalist', country:'Sweden',    websiteUrl:'https://www.acnestudios.com',       rating:4.6, reviewsCount:15000, popularity:78, sustainabilityScore:68, trustScore:87, priceRange:'luxury',  tags:['scandinavian','minimalist','luxury'],               featured:false },
+  { id:'b37', name:'Michael Kors',   slug:'michael-kors',   logoUrl:L.michaelkors,   description:'New York accessible luxury brand known for jet-set glamour, gold-toned hardware and sophisticated handbags and RTW.',                    category:'minimalist', country:'USA',       websiteUrl:'https://www.michaelkors.com',       rating:4.2, reviewsCount:29000, popularity:80, sustainabilityScore:52, trustScore:82, priceRange:'premium', tags:['accessible-luxury','american','handbags'],         featured:false },
+  { id:'b38', name:'NEXT',           slug:'next-uk',        logoUrl:L.nextuk,        description:'British high street stalwart offering quality clothing, footwear and home products at accessible prices since 1864.',                     category:'minimalist', country:'UK',        websiteUrl:'https://www.next.co.uk',            rating:4.1, reviewsCount:42000, popularity:78, sustainabilityScore:55, trustScore:82, priceRange:'budget',  tags:['british','highstreet','quality'],                  featured:false },
+  { id:'b39', name:'M&S',            slug:'marks-and-spencer',logoUrl:L.marksandspencer,description:'British retail icon trusted for quality food, clothing and home since 1884 — famous for reliable basics and classic British style.',  category:'minimalist', country:'UK',        websiteUrl:'https://www.marksandspencer.com',   rating:4.3, reviewsCount:48000, popularity:80, sustainabilityScore:65, trustScore:88, priceRange:'mid',     tags:['british','heritage','quality'],                    featured:false },
+  { id:'b40', name:'Hugo Boss',      slug:'hugo-boss',      logoUrl:L.hugoboss,      description:'German luxury fashion house known for sharp tailoring, sophisticated menswear and a global vision of modern masculinity.',                category:'minimalist', country:'Germany',   websiteUrl:'https://www.hugoboss.com',          rating:4.4, reviewsCount:26000, popularity:82, sustainabilityScore:60, trustScore:87, priceRange:'premium', tags:['tailoring','german','menswear'],                   featured:false },
+
+  // ── LUXURY ──────────────────────────────────────────────────────────────
+  { id:'b41', name:'Gucci',          slug:'gucci',          logoUrl:L.gucci,         description:'Iconic Italian luxury house blending maximalist style with heritage craftsmanship and bold creative vision since 1921.',                  category:'luxury',     country:'Italy',     websiteUrl:'https://www.gucci.com',             rating:4.8, reviewsCount:41000, popularity:95, sustainabilityScore:60, trustScore:96, priceRange:'luxury',  tags:['luxury','iconic','heritage',editorPickTag],        featured:true  },
+  { id:'b42', name:'Louis Vuitton',  slug:'louis-vuitton',  logoUrl:L.louisvuitton,  description:"The world's most valuable luxury brand — monogram canvas, exceptional leather goods and Parisian elegance since 1854.",                  category:'luxury',     country:'France',    websiteUrl:'https://www.louisvuitton.com',      rating:4.9, reviewsCount:38000, popularity:96, sustainabilityScore:58, trustScore:97, priceRange:'luxury',  tags:['luxury','heritage','leather',editorPickTag],       featured:true  },
+  { id:'b43', name:'Chanel',         slug:'chanel',         logoUrl:L.chanel,        description:'Parisian luxury house that liberated women from corsets, invented the little black dress and created the world\'s most famous perfume.',  category:'luxury',     country:'France',    websiteUrl:'https://www.chanel.com',            rating:4.9, reviewsCount:36000, popularity:96, sustainabilityScore:62, trustScore:97, priceRange:'luxury',  tags:['luxury','paris','iconic',editorPickTag],           featured:true  },
+  { id:'b44', name:'Hermès',         slug:'hermes',         logoUrl:L.hermes,        description:'Parisian saddle-maker turned luxury powerhouse — Birkin bags, silk scarves and the most coveted orange boxes in the world.',             category:'luxury',     country:'France',    websiteUrl:'https://www.hermes.com',            rating:4.9, reviewsCount:22000, popularity:94, sustainabilityScore:70, trustScore:98, priceRange:'luxury',  tags:['luxury','paris','craftmanship',editorPickTag],     featured:false },
+  { id:'b45', name:'Prada',          slug:'prada',          logoUrl:L.prada,         description:"Italian intellectual luxury brand known for clean-lined modernity, innovative materials and Milan's iconic triangle logo.",               category:'luxury',     country:'Italy',     websiteUrl:'https://www.prada.com',             rating:4.8, reviewsCount:31000, popularity:91, sustainabilityScore:62, trustScore:93, priceRange:'luxury',  tags:['luxury','minimalist','italian',editorPickTag],     featured:false },
+  { id:'b46', name:'Versace',        slug:'versace',        logoUrl:L.versace,       description:'Milan-born luxury house synonymous with bold prints, Medusa iconography and unapologetic opulence since 1978.',                          category:'luxury',     country:'Italy',     websiteUrl:'https://www.versace.com',           rating:4.7, reviewsCount:28000, popularity:89, sustainabilityScore:54, trustScore:90, priceRange:'luxury',  tags:['luxury','bold','italian'],                         featured:false },
+  { id:'b47', name:'Balenciaga',     slug:'balenciaga',     logoUrl:L.balenciaga,    description:'Spanish luxury house reborn as a provocateur of contemporary fashion, known for oversized silhouettes and cultural commentary.',          category:'luxury',     country:'France',    websiteUrl:'https://www.balenciaga.com',        rating:4.6, reviewsCount:24000, popularity:90, sustainabilityScore:52, trustScore:88, priceRange:'luxury',  tags:['luxury','avant-garde','streetwear'],               featured:false },
+  { id:'b48', name:'Burberry',       slug:'burberry',       logoUrl:L.burberry,      description:'British heritage brand famous for its iconic check pattern, trench coats and enduring English countryside elegance.',                    category:'luxury',     country:'UK',        websiteUrl:'https://www.burberry.com',          rating:4.5, reviewsCount:26000, popularity:86, sustainabilityScore:65, trustScore:90, priceRange:'luxury',  tags:['luxury','british','heritage'],                     featured:false },
+  { id:'b49', name:'Saint Laurent',  slug:'saint-laurent',  logoUrl:L.saintlaurent,  description:'Parisian fashion house that invented the tuxedo suit for women and redefined French elegance with rock and roll attitude.',              category:'luxury',     country:'France',    websiteUrl:'https://www.ysl.com',               rating:4.8, reviewsCount:20000, popularity:88, sustainabilityScore:58, trustScore:92, priceRange:'luxury',  tags:['luxury','paris','rock-chic'],                      featured:false },
+  { id:'b50', name:'Ralph Lauren',   slug:'ralph-lauren',   logoUrl:L.ralphlauren,   description:'American luxury lifestyle brand defining preppy elegance, classic polo shirts and aspirational living since 1967.',                      category:'luxury',     country:'USA',       websiteUrl:'https://www.ralphlauren.com',       rating:4.5, reviewsCount:36000, popularity:87, sustainabilityScore:55, trustScore:89, priceRange:'premium', tags:['luxury','american','classic'],                     featured:false },
+  { id:'b51', name:'Givenchy',       slug:'givenchy',       logoUrl:L.givenchy,      description:'Parisian luxury house known for elegant minimalism, Audrey Hepburn\'s little black dress and Riccardo Tisci\'s dark romanticism.',       category:'luxury',     country:'France',    websiteUrl:'https://www.givenchy.com',          rating:4.7, reviewsCount:16000, popularity:84, sustainabilityScore:60, trustScore:90, priceRange:'luxury',  tags:['luxury','paris','minimalist'],                     featured:false },
+  { id:'b52', name:'Armani',         slug:'armani',         logoUrl:L.armani,        description:'Milan-based fashion empire built on understated luxury, perfectly cut suits and the concept of power dressing since 1975.',              category:'luxury',     country:'Italy',     websiteUrl:'https://www.armani.com',            rating:4.6, reviewsCount:24000, popularity:85, sustainabilityScore:58, trustScore:90, priceRange:'luxury',  tags:['luxury','italian','tailoring'],                    featured:false },
+
+  // ── SUSTAINABLE ─────────────────────────────────────────────────────────
+  { id:'b53', name:'Patagonia',      slug:'patagonia',      logoUrl:L.patagonia,     description:'Outdoor apparel pioneer and environmental activist, making gear built to last, be repaired and protect wild places.',                    category:'sustainable',country:'USA',       websiteUrl:'https://www.patagonia.com',         rating:4.8, reviewsCount:34000, popularity:85, sustainabilityScore:98, trustScore:96, priceRange:'premium', tags:['sustainable','outdoor','ethical',editorPickTag],   featured:true  },
+  { id:'b54', name:'Everlane',       slug:'everlane',       logoUrl:L.everlane,      description:'Radical transparency meets sustainable basics — every price tag breaks down the true cost of production honestly.',                      category:'sustainable',country:'USA',       websiteUrl:'https://www.everlane.com',          rating:4.4, reviewsCount:19000, popularity:78, sustainabilityScore:88, trustScore:88, priceRange:'mid',     tags:['sustainable','transparent','basics',editorPickTag],featured:false },
+  { id:'b55', name:'Reformation',    slug:'reformation',    logoUrl:L.reformation,   description:"Sustainable women's fashion brand making vintage-inspired clothes with a certified low environmental footprint.",                        category:'sustainable',country:'USA',       websiteUrl:'https://www.thereformation.com',    rating:4.5, reviewsCount:17000, popularity:80, sustainabilityScore:92, trustScore:87, priceRange:'premium', tags:['sustainable','womenswear','vintage-inspired'],      featured:false },
+  { id:'b56', name:"Arc'teryx",      slug:'arcteryx',       logoUrl:L.arcteryx,      description:'Vancouver technical outerwear brand obsessively engineered for alpinists and outdoor athletes.',                                         category:'sustainable',country:'Canada',    websiteUrl:'https://www.arcteryx.com',          rating:4.8, reviewsCount:18000, popularity:82, sustainabilityScore:78, trustScore:94, priceRange:'luxury',  tags:['outdoor','technical','premium',editorPickTag],     featured:false },
+  { id:'b57', name:'The North Face', slug:'the-north-face', logoUrl:L.thenorthface,  description:'San Francisco outdoor brand that outfitted early Himalayan expeditions, now a staple of city streets and alpine trails alike.',          category:'sustainable',country:'USA',       websiteUrl:'https://www.thenorthface.com',      rating:4.5, reviewsCount:42000, popularity:87, sustainabilityScore:72, trustScore:88, priceRange:'premium', tags:['outdoor','adventure','technical'],                 featured:false },
+  { id:'b58', name:'Pangaia',        slug:'pangaia',        logoUrl:L.pangaia,       description:'Science-led materials company making vibrant essentials from algae, eucalyptus and recycled fibres with a mission to save the planet.',  category:'sustainable',country:'UK',        websiteUrl:'https://pangaia.com',               rating:4.5, reviewsCount:12000, popularity:74, sustainabilityScore:96, trustScore:88, priceRange:'premium', tags:['sustainable','science','materials',editorPickTag], featured:false },
+  { id:'b59', name:'Veja',           slug:'veja',           logoUrl:L.veja,          description:'French sneaker brand making shoes from organic cotton and wild Amazonian rubber, proving ethical fashion can look great.',               category:'sustainable',country:'France',    websiteUrl:'https://www.veja-store.com',        rating:4.6, reviewsCount:14000, popularity:76, sustainabilityScore:94, trustScore:91, priceRange:'premium', tags:['sustainable','sneakers','french',editorPickTag],   featured:false },
+  { id:'b60', name:'Nudie Jeans',    slug:'nudie-jeans',    logoUrl:L.nudiejeans,    description:'Swedish denim brand committed to 100% organic cotton and free repairs for life — jeans you grow into and never throw away.',            category:'sustainable',country:'Sweden',    websiteUrl:'https://www.nudiejeans.com',        rating:4.6, reviewsCount:11000, popularity:73, sustainabilityScore:97, trustScore:92, priceRange:'premium', tags:['sustainable','denim','organic',editorPickTag],     featured:false },
+  { id:'b61', name:'Country Road',   slug:'country-road',   logoUrl:L.countryroad,   description:'Australian lifestyle brand offering timeless wardrobe essentials crafted with a commitment to quality, ethics and the environment.',     category:'sustainable',country:'Australia', websiteUrl:'https://www.countryroad.com.au',    rating:4.3, reviewsCount:9000,  popularity:68, sustainabilityScore:80, trustScore:84, priceRange:'mid',     tags:['australian','ethical','timeless'],                 featured:false },
+
+  // ── ETHNIC ──────────────────────────────────────────────────────────────
+  { id:'b62', name:'FabIndia',       slug:'fabindia',       logoUrl:L.fabindia,      description:'India\'s gold standard of ethical fashion — handloom fabrics, artisan partnerships and the nation\'s craft heritage in every stitch.',   category:'ethnic',     country:'India',     websiteUrl:'https://www.fabindia.com',          rating:4.6, reviewsCount:28000, popularity:84, sustainabilityScore:90, trustScore:90, priceRange:'mid',     tags:['indian','handloom','sustainable',editorPickTag],   featured:true  },
+  { id:'b63', name:'Manyavar',       slug:'manyavar',       logoUrl:L.manyavar,      description:"India's No.1 men's ethnic wear brand, dressing grooms and families for weddings and celebrations with sherwanis and kurtas.",            category:'ethnic',     country:'India',     websiteUrl:'https://www.manyavar.com',          rating:4.5, reviewsCount:22000, popularity:82, sustainabilityScore:60, trustScore:88, priceRange:'mid',     tags:['indian','ethnic','menswear',editorPickTag],        featured:true  },
+  { id:'b64', name:'BIBA',           slug:'biba',           logoUrl:L.biba,          description:"India's most recognised women's ethnic brand since 1988, offering vibrant salwar suits, kurtas and Indo-western styles.",                category:'ethnic',     country:'India',     websiteUrl:'https://www.biba.in',               rating:4.3, reviewsCount:18000, popularity:80, sustainabilityScore:58, trustScore:84, priceRange:'budget',  tags:['indian','womenswear','ethnic'],                    featured:false },
+  { id:'b65', name:'W for Woman',    slug:'w-for-woman',    logoUrl:L.wforwoman,     description:'Contemporary Indian women\'s brand blending modern silhouettes with ethnic sensibility through kurtas, fusion wear and separates.',      category:'ethnic',     country:'India',     websiteUrl:'https://www.wforwoman.com',         rating:4.2, reviewsCount:15000, popularity:76, sustainabilityScore:55, trustScore:82, priceRange:'budget',  tags:['indian','fusion','womenswear'],                    featured:false },
+  { id:'b66', name:'Allen Solly',    slug:'allen-solly',    logoUrl:L.allensolly,    description:"India's pioneer of Friday dressing — smart casuals, colourful shirts and relaxed tailoring that redefined Indian office wear.",          category:'ethnic',     country:'India',     websiteUrl:'https://www.allensolly.com',        rating:4.2, reviewsCount:20000, popularity:78, sustainabilityScore:55, trustScore:82, priceRange:'mid',     tags:['indian','smart-casual','office'],                  featured:false },
+  { id:'b67', name:'Raymond',        slug:'raymond',        logoUrl:L.raymond,       description:'The Complete Man — India\'s iconic suiting brand since 1925, synonymous with premium wool fabric and fine tailored menswear.',            category:'ethnic',     country:'India',     websiteUrl:'https://www.raymond.in',            rating:4.4, reviewsCount:24000, popularity:80, sustainabilityScore:58, trustScore:86, priceRange:'mid',     tags:['indian','suiting','heritage',editorPickTag],       featured:false },
+  { id:'b68', name:'Van Heusen',     slug:'van-heusen',     logoUrl:L.vanheusen,     description:'International brand made iconic in India — formal shirts, smart casuals and suits that power the Indian professional wardrobe.',         category:'ethnic',     country:'India',     websiteUrl:'https://www.vanheusenindia.com',    rating:4.1, reviewsCount:18000, popularity:76, sustainabilityScore:52, trustScore:80, priceRange:'mid',     tags:['formal','indian','office'],                        featured:false },
+  { id:'b69', name:'Peter England',  slug:'peter-england',  logoUrl:L.peterpengland, description:'British-heritage brand built for Indian professionals — affordable, reliable formal shirts and suits trusted by millions.',               category:'ethnic',     country:'India',     websiteUrl:'https://www.peterengland.com',      rating:4.0, reviewsCount:16000, popularity:74, sustainabilityScore:50, trustScore:78, priceRange:'budget',  tags:['formal','affordable','indian'],                    featured:false },
+  { id:'b70', name:'Aurelia',        slug:'aurelia',        logoUrl:L.aurelia,       description:'Women\'s ethnic wear brand offering affordable kurtas, printed tunics and fusion separates with a fresh, contemporary take.',             category:'ethnic',     country:'India',     websiteUrl:'https://www.aurelia.co.in',         rating:4.1, reviewsCount:12000, popularity:72, sustainabilityScore:54, trustScore:78, priceRange:'budget',  tags:['indian','womenswear','affordable'],                featured:false },
+  { id:'b71', name:'Global Desi',    slug:'global-desi',    logoUrl:L.globaldesi,    description:'By Anita Dongre — vibrant bohemian ethnic wear for free-spirited women who love colour, print and a touch of the eclectic.',            category:'ethnic',     country:'India',     websiteUrl:'https://www.globaldesi.in',         rating:4.2, reviewsCount:10000, popularity:70, sustainabilityScore:58, trustScore:80, priceRange:'mid',     tags:['indian','bohemian','ethnic'],                      featured:false },
+  { id:'b72', name:'Sabyasachi',     slug:'sabyasachi',     logoUrl:L.sabyasachi,    description:"India's most celebrated couturier — Sabyasachi Mukherjee's opulent bridal wear and revival of India's handcraft traditions.",           category:'ethnic',     country:'India',     websiteUrl:'https://www.sabyasachi.com',        rating:4.8, reviewsCount:8000,  popularity:78, sustainabilityScore:72, trustScore:92, priceRange:'luxury',  tags:['indian','couture','bridal',editorPickTag],         featured:false },
+  { id:'b73', name:'Monte Carlo',    slug:'monte-carlo',    logoUrl:L.montecarlo,    description:'Indian winter wear leader since 1984 — trusted for quality woollens, sweaters and knitwear across North India.',                        category:'ethnic',     country:'India',     websiteUrl:'https://www.montecarlo.in',         rating:4.1, reviewsCount:14000, popularity:70, sustainabilityScore:52, trustScore:78, priceRange:'budget',  tags:['indian','winter','woollens'],                      featured:false },
+
+  // ── OTHERS ──────────────────────────────────────────────────────────────
+  { id:'b74', name:'Comme des Garçons',slug:'comme-des-garcons',logoUrl:L.comme,     description:'Tokyo avant-garde fashion house by Rei Kawakubo — challenging the very definition of clothing, beauty and the human form.',            category:'streetwear', country:'Japan',     websiteUrl:'https://www.comme-des-garcons.com', rating:4.7, reviewsCount:10000, popularity:76, sustainabilityScore:60, trustScore:88, priceRange:'luxury',  tags:['japanese','avant-garde','conceptual'],             featured:false },
+  { id:'b75', name:'Issey Miyake',   slug:'issey-miyake',   logoUrl:L.isseymiyake,   description:'Japanese designer famous for Pleats Please, A-POC technology and turning fashion into wearable sculpture for all body types.',           category:'minimalist', country:'Japan',     websiteUrl:'https://www.isseymiyake.com',       rating:4.7, reviewsCount:8000,  popularity:72, sustainabilityScore:70, trustScore:90, priceRange:'luxury',  tags:['japanese','innovative','pleats'],                  featured:false },
+  { id:'b76', name:'Dolce & Gabbana',slug:'dolce-gabbana',  logoUrl:L.dolcegabbana,  description:'Milan luxury duo known for Mediterranean passion, Sicilian tailoring, lace, prints and unabashedly opulent Italian glamour.',           category:'luxury',     country:'Italy',     websiteUrl:'https://www.dolcegabbana.com',      rating:4.5, reviewsCount:18000, popularity:82, sustainabilityScore:50, trustScore:84, priceRange:'luxury',  tags:['luxury','italian','glamour'],                      featured:false },
+  { id:'b77', name:'Kate Spade',     slug:'kate-spade',     logoUrl:L.katespade,     description:'New York brand bringing colour, wit and feminine elegance to handbags, accessories and ready-to-wear for the modern woman.',             category:'luxury',     country:'USA',       websiteUrl:'https://www.katespade.com',         rating:4.3, reviewsCount:22000, popularity:80, sustainabilityScore:54, trustScore:84, priceRange:'premium', tags:['american','feminine','handbags'],                  featured:false },
+  { id:'b78', name:'Coach',          slug:'coach',          logoUrl:L.coach,         description:'New York leather goods house since 1941, crafting accessible luxury handbags and accessories with American craftsmanship.',               category:'luxury',     country:'USA',       websiteUrl:'https://www.coach.com',             rating:4.3, reviewsCount:28000, popularity:82, sustainabilityScore:56, trustScore:84, priceRange:'premium', tags:['american','leather','handbags'],                   featured:false },
+  { id:'b79', name:'Topshop',        slug:'topshop',        logoUrl:L.topshop,       description:'Iconic British high street brand that set trends for decades, now living online as a digital-first fashion destination.',                 category:'streetwear', country:'UK',        websiteUrl:'https://www.topshop.com',           rating:4.0, reviewsCount:32000, popularity:76, sustainabilityScore:48, trustScore:78, priceRange:'budget',  tags:['british','highstreet','trendy'],                   featured:false },
+  { id:'b80', name:'GAP',            slug:'gap',            logoUrl:L.gap,           description:'San Francisco casual staple since 1969 — the original destination for easy American denim, khakis and everyday wardrobe essentials.',    category:'minimalist', country:'USA',       websiteUrl:'https://www.gap.com',               rating:4.0, reviewsCount:45000, popularity:82, sustainabilityScore:60, trustScore:82, priceRange:'budget',  tags:['american','casual','basics'],                      featured:false },
+
+  // ── 20 NEW BRANDS ───────────────────────────────────────────────────────
+
+  // India
+  { id:'b81', name:'FabAlley',        slug:'faballey',        logoUrl:L.fabally,       description:'Bold, fashion-forward Indian womenswear brand delivering trend-led western and fusion styles at accessible prices.',                           category:'ethnic',     country:'India',    websiteUrl:'https://www.faballey.com',          rating:4.2, reviewsCount:11000, popularity:72, sustainabilityScore:52, trustScore:80, priceRange:'budget',  tags:['indian','womenswear','western'],                   featured:false },
+  { id:'b82', name:'Anita Dongre',    slug:'anita-dongre',    logoUrl:L.anita_dongre,  description:'Celebrated Indian designer championing slow fashion, organic textiles and artisanal craftsmanship through luxury prêt and bridal couture.',   category:'ethnic',     country:'India',    websiteUrl:'https://www.anitadongre.com',       rating:4.7, reviewsCount:9000,  popularity:74, sustainabilityScore:85, trustScore:88, priceRange:'luxury',  tags:['indian','couture','sustainable',editorPickTag],    featured:false },
+  { id:'b83', name:'Ritu Kumar',      slug:'ritu-kumar',      logoUrl:L.ritu_kumar,    description:"India's pioneering luxury fashion label since 1969 — reviving block prints, zardozi and traditional embroidery for modern Indian women.",     category:'ethnic',     country:'India',    websiteUrl:'https://www.ritukumar.com',         rating:4.6, reviewsCount:8000,  popularity:72, sustainabilityScore:70, trustScore:86, priceRange:'luxury',  tags:['indian','heritage','embroidery',editorPickTag],    featured:false },
+  { id:'b84', name:'WROGN',           slug:'wrogn',           logoUrl:L.wrogn,         description:'Virat Kohli\'s edgy streetwear label targeting Indian youth with bold prints, attitude-driven graphics and urban silhouettes.',               category:'streetwear', country:'India',    websiteUrl:'https://www.wrogn.com',             rating:4.1, reviewsCount:14000, popularity:76, sustainabilityScore:48, trustScore:78, priceRange:'budget',  tags:['indian','streetwear','youth'],                     featured:false },
+  { id:'b85', name:'HRX',             slug:'hrx',             logoUrl:L.hrx,           description:'Hrithik Roshan\'s fitness and activewear brand delivering performance-focused sportswear for the driven and disciplined Indian consumer.',     category:'athleisure', country:'India',    websiteUrl:'https://www.hrxbrand.com',          rating:4.2, reviewsCount:12000, popularity:74, sustainabilityScore:55, trustScore:80, priceRange:'budget',  tags:['indian','fitness','activewear'],                   featured:false },
+  { id:'b86', name:'Libas',           slug:'libas',           logoUrl:L.libas,         description:'Affordable Indian ethnic and fusion wear brand offering a wide range of kurtas, co-ord sets and festive collections for everyday style.',      category:'ethnic',     country:'India',    websiteUrl:'https://www.libas.in',              rating:4.0, reviewsCount:13000, popularity:70, sustainabilityScore:50, trustScore:76, priceRange:'budget',  tags:['indian','ethnic','affordable'],                    featured:false },
+
+  // UK
+  { id:'b87', name:'Ted Baker',       slug:'ted-baker',       logoUrl:L.ted_baker,     description:'British luxury lifestyle brand known for its quirky details, distinctive prints and perfectly tailored pieces with a playful sensibility.',    category:'luxury',     country:'UK',       websiteUrl:'https://www.tedbaker.com',          rating:4.4, reviewsCount:19000, popularity:78, sustainabilityScore:58, trustScore:84, priceRange:'premium', tags:['british','luxury','tailoring'],                    featured:false },
+  { id:'b88', name:'AllSaints',       slug:'allsaints',       logoUrl:L.allsaints,     description:'East London brand defined by rock-influenced leather jackets, dark palettes and effortlessly cool British design since 1994.',                 category:'streetwear', country:'UK',       websiteUrl:'https://www.allsaints.com',         rating:4.3, reviewsCount:16000, popularity:76, sustainabilityScore:55, trustScore:82, priceRange:'premium', tags:['british','rock','leather'],                        featured:false },
+  { id:'b89', name:'Reiss',           slug:'reiss',           logoUrl:L.reiss,         description:'British premium fashion brand offering sophisticated, modern clothing with an emphasis on quality fabrics and sharp tailoring.',                category:'minimalist', country:'UK',       websiteUrl:'https://www.reiss.com',             rating:4.4, reviewsCount:14000, popularity:74, sustainabilityScore:60, trustScore:84, priceRange:'premium', tags:['british','premium','tailoring'],                   featured:false },
+
+  // France
+  { id:'b90', name:'AMI Paris',       slug:'ami-paris',       logoUrl:L.ami,           description:'Parisian label by Alexandre Mattiussi celebrating the style of a Parisian friend — casual, wearable luxury with a warm heart logo.',         category:'luxury',     country:'France',   websiteUrl:'https://www.amiparis.com',          rating:4.6, reviewsCount:12000, popularity:76, sustainabilityScore:64, trustScore:86, priceRange:'luxury',  tags:['french','casual-luxury','paris',editorPickTag],    featured:false },
+  { id:'b91', name:'Jacquemus',       slug:'jacquemus',       logoUrl:L.jacquemus,     description:'Provence-born avant-garde label by Simon Porte Jacquemus — mini bags, dramatic silhouettes and sun-drenched Mediterranean aesthetics.',       category:'luxury',     country:'France',   websiteUrl:'https://www.jacquemus.com',         rating:4.7, reviewsCount:10000, popularity:80, sustainabilityScore:60, trustScore:87, priceRange:'luxury',  tags:['french','avant-garde','viral',editorPickTag],      featured:false },
+
+  // Italy
+  { id:'b92', name:'Moncler',         slug:'moncler',         logoUrl:L.moncler,       description:'French-Italian luxury outerwear brand born in the Alps in 1952 — iconic quilted down jackets worn from ski slopes to city streets.',          category:'luxury',     country:'Italy',    websiteUrl:'https://www.moncler.com',           rating:4.7, reviewsCount:16000, popularity:84, sustainabilityScore:62, trustScore:90, priceRange:'luxury',  tags:['luxury','outerwear','italian',editorPickTag],      featured:false },
+  { id:'b93', name:'Max Mara',        slug:'max-mara',        logoUrl:L.maxmara,       description:'Italian fashion house synonymous with the perfect camel coat — understated luxury, impeccable tailoring and timeless Italian elegance.',       category:'luxury',     country:'Italy',    websiteUrl:'https://www.maxmara.com',           rating:4.6, reviewsCount:11000, popularity:76, sustainabilityScore:65, trustScore:88, priceRange:'luxury',  tags:['italian','luxury','coats'],                        featured:false },
+
+  // Germany
+  { id:'b94', name:'HUGO',            slug:'hugo',            logoUrl:L.hugo,          description:'Hugo Boss\'s youthful red label — bold, contemporary fashion for a new generation with an irreverent take on classic tailoring.',              category:'streetwear', country:'Germany',  websiteUrl:'https://www.hugoboss.com/hugo',     rating:4.2, reviewsCount:18000, popularity:76, sustainabilityScore:58, trustScore:82, priceRange:'mid',     tags:['german','contemporary','bold'],                    featured:false },
+
+  // USA
+  { id:'b95', name:'Polo Ralph Lauren',slug:'polo-ralph-lauren',logoUrl:L.polo,        description:'The quintessential American polo shirt — Ralph Lauren\'s flagship line blending sport heritage with aspirational preppy lifestyle.',           category:'athleisure', country:'USA',      websiteUrl:'https://www.ralphlauren.com/polo',  rating:4.5, reviewsCount:42000, popularity:88, sustainabilityScore:55, trustScore:88, priceRange:'premium', tags:['american','polo','preppy'],                        featured:false },
+  { id:'b96', name:'Tory Burch',      slug:'tory-burch',      logoUrl:L.tory_burch,   description:'New York designer brand merging bohemian style with classic American sportswear — known for the double-T logo and colourful accessories.',     category:'luxury',     country:'USA',      websiteUrl:'https://www.toryburch.com',         rating:4.4, reviewsCount:20000, popularity:78, sustainabilityScore:58, trustScore:84, priceRange:'premium', tags:['american','boho','accessories'],                   featured:false },
+  { id:'b97', name:'Banana Republic', slug:'banana-republic', logoUrl:L.banana_republic,description:'Gap Inc\'s upscale work-to-weekend brand offering refined casual wear, tailored pieces and elevated basics for the modern professional.',    category:'minimalist', country:'USA',      websiteUrl:'https://www.bananarepublic.com',    rating:4.1, reviewsCount:24000, popularity:74, sustainabilityScore:58, trustScore:80, priceRange:'mid',     tags:['american','workwear','refined'],                   featured:false },
+
+  // Japan
+  { id:'b98', name:'WTAPS',           slug:'wtaps',           logoUrl:L.wtaps,         description:'Tokyo military-inspired streetwear label by Tetsu Nishiyama — functional design, minimal branding and loyal cult following since 1996.',      category:'streetwear', country:'Japan',    websiteUrl:'https://www.wtaps.com',             rating:4.6, reviewsCount:7000,  popularity:72, sustainabilityScore:60, trustScore:86, priceRange:'premium', tags:['japanese','military','streetwear',editorPickTag],  featured:false },
+  { id:'b99', name:'Neighborhood',    slug:'neighborhood',    logoUrl:L.neighborhood,  description:'Tokyo streetwear institution fusing American workwear, biker culture and Japanese craftsmanship into premium limited-edition collections.',    category:'streetwear', country:'Japan',    websiteUrl:'https://www.neighborhood.jp',       rating:4.5, reviewsCount:8000,  popularity:70, sustainabilityScore:58, trustScore:84, priceRange:'premium', tags:['japanese','workwear','biker'],                     featured:false },
+
+  // Korea
+  { id:'b100',name:'Ader Error',      slug:'ader-error',      logoUrl:L.ader_error,    description:'Seoul-based creative collective redefining Korean street fashion with surrealist graphics, oversized silhouettes and art-world sensibility.',   category:'streetwear', country:'South Korea',websiteUrl:'https://en.adererror.com',         rating:4.5, reviewsCount:9000,  popularity:74, sustainabilityScore:60, trustScore:84, priceRange:'premium', tags:['korean','streetwear','art',editorPickTag],         featured:false },
+
+  // Portugal
+  { id:'b101',name:'Salsa Jeans',     slug:'salsa-jeans',     logoUrl:L.salsa,         description:'Portuguese denim specialist offering innovative fits, premium washes and fashion-forward styles rooted in 30 years of jean-making expertise.', category:'streetwear', country:'Portugal', websiteUrl:'https://www.salsajeans.com',        rating:4.2, reviewsCount:10000, popularity:68, sustainabilityScore:62, trustScore:80, priceRange:'mid',     tags:['denim','portuguese','innovative'],                 featured:false },
+
+  // Netherlands
+  { id:'b102',name:'Scotch & Soda',   slug:'scotch-and-soda', logoUrl:L.scotch_soda,   description:'Amsterdam-born fashion brand with an eclectic, artistic spirit — bold prints, unexpected textures and a Dutch flair for the unconventional.',  category:'minimalist', country:'Netherlands',websiteUrl:'https://www.scotch-soda.com',      rating:4.3, reviewsCount:13000, popularity:72, sustainabilityScore:62, trustScore:82, priceRange:'mid',     tags:['dutch','eclectic','prints'],                       featured:false },
 ]

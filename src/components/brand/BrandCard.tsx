@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Heart, Star, TrendingUp } from 'lucide-react'
+import { Heart, Star, TrendingUp, ExternalLink } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Brand } from '@/services/brand'
@@ -35,23 +35,38 @@ const imageVariants = {
   hover: { scale: 1.05, transition: { duration: 0.4 } },
 }
 
-const badgeVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { delay: 0.2 } },
+function BrandLogo({
+  brand,
+  className,
+  imgClassName,
+}: {
+  brand: Brand
+  className?: string
+  imgClassName?: string
+}) {
+  return (
+    <div className={cn('flex items-center justify-center', className)}>
+      <img
+        src={brand.logoUrl}
+        alt={brand.name}
+        className={cn('object-contain', imgClassName)}
+        loading="lazy"
+        onError={(e) => {
+          const svg = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'><rect width='200' height='80' fill='%236d28d9'/><text x='100' y='50' text-anchor='middle' font-family='Arial,sans-serif' font-size='20' font-weight='700' fill='white'>${encodeURIComponent(brand.name)}</text></svg>`
+          e.currentTarget.src = svg
+          e.currentTarget.onerror = null
+        }}
+      />
+    </div>
+  )
 }
 
-function avatarFallback(name: string) {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=128&background=6d28d9&color=fff&bold=true`
-}
-
-// Default variant: large card for grid layouts
+// ── DEFAULT ──────────────────────────────────────────────────────────────────
 function DefaultCard({ brand, index }: BrandCardProps) {
-  const favorites = useFavoritesStore((state) => state.ids)
-  const toggleFavorite = useFavoritesStore((state) => state.toggle)
+  const favorites = useFavoritesStore((s) => s.ids)
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   const isFav = favorites.includes(brand.id)
-
-  const trendingScore = (brand.popularity + brand.trustScore) / 2
-  const isTrending = trendingScore > 75
+  const isTrending = (brand.popularity + brand.trustScore) / 2 > 75
 
   return (
     <motion.div
@@ -66,40 +81,25 @@ function DefaultCard({ brand, index }: BrandCardProps) {
       <Card className="h-full overflow-hidden cursor-pointer transition-all hover:shadow-lg hover:border-primary/30 rounded-2xl">
         <CardContent className="p-0 flex flex-col h-full">
 
-          {/* Logo area — white background, centered */}
-          <div
-            className="relative bg-white flex items-center justify-center border-b"
-            style={{ height: '160px' }}
-          >
-            <motion.img
-              src={brand.logoUrl}
-              alt={brand.name}
-              className="object-contain w-auto h-auto"
-              style={{ maxHeight: '80px', maxWidth: '140px' }}
-              variants={imageVariants}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.src = avatarFallback(brand.name) }}
-            />
+          {/* Logo */}
+          <div className="relative bg-white flex items-center justify-center border-b" style={{ height: '160px' }}>
+            <motion.div variants={imageVariants} className="flex items-center justify-center w-full h-full p-4">
+              <BrandLogo brand={brand} imgClassName="max-h-[80px] max-w-[140px] w-auto h-auto" />
+            </motion.div>
 
-            {/* Badges */}
             <div className="absolute top-3 right-3 flex flex-wrap gap-1 justify-end">
               {isFav && (
-                <motion.div variants={badgeVariants} initial="hidden" animate="visible">
-                  <Badge className="bg-primary text-primary-foreground text-[10px]">Saved</Badge>
-                </motion.div>
+                <Badge className="bg-primary text-primary-foreground text-[10px]">Saved</Badge>
               )}
               {isTrending && (
-                <motion.div variants={badgeVariants} initial="hidden" animate="visible">
-                  <Badge variant="outline" className="gap-1 bg-white text-[10px]">
-                    <TrendingUp className="size-3" /> Trending
-                  </Badge>
-                </motion.div>
+                <Badge variant="outline" className="gap-1 bg-white text-[10px]">
+                  <TrendingUp className="size-3" /> Trending
+                </Badge>
               )}
             </div>
 
-            {/* Favorite button */}
             <motion.button
-              onClick={() => toggleFavorite(brand.id)}
+              onClick={(e) => { e.preventDefault(); toggleFavorite(brand.id) }}
               className={cn(
                 'absolute bottom-3 left-3 z-10 p-2 rounded-full transition-all shadow-sm',
                 'bg-white/90 backdrop-blur-sm hover:bg-white',
@@ -108,17 +108,7 @@ function DefaultCard({ brand, index }: BrandCardProps) {
               whileTap={{ scale: 0.9 }}
               aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <motion.div
-                animate={{ scale: isFav ? 1.2 : 1 }}
-                transition={{ type: 'spring', stiffness: 400 }}
-              >
-                <Heart
-                  className={cn(
-                    'size-4 transition-colors',
-                    isFav && 'fill-red-500 text-red-500',
-                  )}
-                />
-              </motion.div>
+              <Heart className={cn('size-4 transition-colors', isFav && 'fill-red-500 text-red-500')} />
             </motion.button>
           </div>
 
@@ -133,12 +123,10 @@ function DefaultCard({ brand, index }: BrandCardProps) {
               </p>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="p-2 rounded-lg bg-accent/50">
                 <div className="flex items-center gap-1 text-primary font-semibold">
-                  <Star className="size-3" />
-                  {formatRating(brand.rating)}
+                  <Star className="size-3" />{formatRating(brand.rating)}
                 </div>
                 <div className="text-muted-foreground text-[10px]">Rating</div>
               </div>
@@ -152,26 +140,33 @@ function DefaultCard({ brand, index }: BrandCardProps) {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="text-xs text-muted-foreground">
-              {formatCount(brand.reviewsCount)} reviews
+            <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
+              <span>{formatCount(brand.reviewsCount)} reviews</span>
+              {brand.websiteUrl && (
+                <a
+                  href={brand.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+              
+              onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1 text-primary hover:underline font-medium relative z-10"
+                >
+                  Official Site <ExternalLink className="size-3" />
+                </a>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-      <Link
-        to={brandDetailPath(brand.slug)}
-        className="absolute inset-0 z-0"
-        aria-label={brand.name}
-      />
+      <Link to={brandDetailPath(brand.slug)} className="absolute inset-0 z-0" aria-label={brand.name} />
     </motion.div>
   )
 }
 
-// Compact variant: for lists and recently viewed
+// ── COMPACT ──────────────────────────────────────────────────────────────────
 function CompactCard({ brand, index }: BrandCardProps) {
-  const favorites = useFavoritesStore((state) => state.ids)
-  const toggleFavorite = useFavoritesStore((state) => state.toggle)
+  const favorites = useFavoritesStore((s) => s.ids)
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   const isFav = favorites.includes(brand.id)
 
   return (
@@ -186,22 +181,15 @@ function CompactCard({ brand, index }: BrandCardProps) {
       <Card className="cursor-pointer overflow-hidden hover:border-primary/50 transition-colors rounded-xl">
         <CardContent className="p-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="size-10 rounded-lg bg-white border flex items-center justify-center shrink-0 p-1">
-              <motion.img
-                src={brand.logoUrl}
-                alt={brand.name}
-                className="w-full h-full object-contain"
-                loading="lazy"
-                whileHover={{ scale: 1.1 }}
-                onError={(e) => { e.currentTarget.src = avatarFallback(brand.name) }}
-              />
+            <div className="size-10 rounded-lg bg-white border flex items-center justify-center shrink-0 overflow-hidden p-1">
+              <BrandLogo brand={brand} imgClassName="w-full h-full object-contain" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-medium text-sm truncate group-hover:text-primary transition-colors">
                 {brand.name}
               </p>
               <p className="text-muted-foreground text-xs capitalize truncate">
-                {brand.category}
+                {brand.category} • {brand.country}
               </p>
             </div>
           </div>
@@ -212,36 +200,38 @@ function CompactCard({ brand, index }: BrandCardProps) {
                 <Star className="size-3 fill-amber-400 text-amber-400" />
                 {formatRating(brand.rating)}
               </div>
+              {brand.websiteUrl && (
+                <a
+                  href={brand.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="text-[10px] text-primary hover:underline flex items-center gap-0.5 relative z-10"
+                >
+                  Visit <ExternalLink className="size-2.5" />
+                </a>
+              )}
             </div>
             <motion.button
-              onClick={() => toggleFavorite(brand.id)}
+              onClick={(e) => { e.preventDefault(); toggleFavorite(brand.id) }}
               className="relative z-10 p-1.5 hover:bg-accent rounded-lg transition-colors"
               whileTap={{ scale: 0.9 }}
               aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart
-                className={cn(
-                  'size-4 transition-colors',
-                  isFav && 'fill-red-500 text-red-500',
-                )}
-              />
+              <Heart className={cn('size-4 transition-colors', isFav && 'fill-red-500 text-red-500')} />
             </motion.button>
           </div>
         </CardContent>
       </Card>
-      <Link
-        to={brandDetailPath(brand.slug)}
-        className="absolute inset-0 z-0"
-        aria-label={brand.name}
-      />
+      <Link to={brandDetailPath(brand.slug)} className="absolute inset-0 z-0" aria-label={brand.name} />
     </motion.div>
   )
 }
 
-// Featured variant: large showcase card
+// ── FEATURED ─────────────────────────────────────────────────────────────────
 function FeaturedCard({ brand, index }: BrandCardProps) {
-  const favorites = useFavoritesStore((state) => state.ids)
-  const toggleFavorite = useFavoritesStore((state) => state.toggle)
+  const favorites = useFavoritesStore((s) => s.ids)
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
   const isFav = favorites.includes(brand.id)
 
   return (
@@ -256,73 +246,61 @@ function FeaturedCard({ brand, index }: BrandCardProps) {
     >
       <Card className="overflow-hidden cursor-pointer rounded-2xl hover:shadow-lg transition-all">
         <CardContent className="p-0">
-          {/* Logo area */}
-          <div
-            className="relative bg-white flex items-center justify-center border-b"
-            style={{ height: '160px' }}
-          >
-            <motion.img
-              src={brand.logoUrl}
-              alt={brand.name}
-              className="object-contain w-auto h-auto"
-              style={{ maxHeight: '90px', maxWidth: '1600px' }}
-              variants={imageVariants}
-              loading="lazy"
-              onError={(e) => { e.currentTarget.src = avatarFallback(brand.name) }}
-            />
+          <div className="relative bg-white flex items-center justify-center border-b" style={{ height: '160px' }}>
+            <motion.div variants={imageVariants} className="flex items-center justify-center w-full h-full p-4">
+              <BrandLogo brand={brand} imgClassName="max-h-[90px] max-w-[160px] w-auto h-auto" />
+            </motion.div>
 
-            {/* Gradient overlay at bottom */}
-            <div className="absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/30 to-transparent" />
-
-            {/* Favorite button */}
             <motion.button
-              onClick={() => toggleFavorite(brand.id)}
+              onClick={(e) => { e.preventDefault(); toggleFavorite(brand.id) }}
               className="absolute top-3 right-3 z-10 p-2 bg-white/80 hover:bg-white backdrop-blur-sm rounded-full transition-colors shadow-sm"
               whileTap={{ scale: 0.9 }}
               aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
             >
-              <Heart
-                className={cn(
-                  'size-4 transition-colors',
-                  isFav && 'fill-red-500 text-red-500',
-                )}
-              />
+              <Heart className={cn('size-4 transition-colors', isFav && 'fill-red-500 text-red-500')} />
             </motion.button>
           </div>
 
-          {/* Content */}
           <div className="p-4">
             <h3 className="font-display text-lg font-bold">{brand.name}</h3>
-            <p className="text-muted-foreground text-sm capitalize mb-3">{brand.category}</p>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-1 font-semibold">
-                <Star className="size-4 fill-amber-400 text-amber-400" />
-                {formatRating(brand.rating)}
+            <p className="text-muted-foreground text-sm capitalize mb-1">{brand.category} • {brand.country}</p>
+            <p className="text-muted-foreground text-xs line-clamp-2 mb-3">{brand.description}</p>
+
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1 font-semibold">
+                  <Star className="size-4 fill-amber-400 text-amber-400" />
+                  {formatRating(brand.rating)}
+                </div>
+                <div className="text-muted-foreground">
+                  Pop: <span className="font-semibold text-foreground">{brand.popularity}</span>
+                </div>
               </div>
-              <div className="text-muted-foreground">
-                Popularity: <span className="font-semibold text-foreground">{brand.popularity}</span>
-              </div>
+              {brand.websiteUrl && (
+                <a
+                  href={brand.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center gap-1 text-xs text-primary hover:underline font-medium relative z-10"
+                >
+                  Official Site <ExternalLink className="size-3" />
+                </a>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-      <Link
-        to={brandDetailPath(brand.slug)}
-        className="absolute inset-0 z-0"
-        aria-label={brand.name}
-      />
+      <Link to={brandDetailPath(brand.slug)} className="absolute inset-0 z-0" aria-label={brand.name} />
     </motion.div>
   )
 }
 
+// ── EXPORT ───────────────────────────────────────────────────────────────────
 export function BrandCard({ brand, variant = 'default', index = 0 }: BrandCardProps) {
   switch (variant) {
-    case 'compact':
-      return <CompactCard brand={brand} index={index} />
-    case 'featured':
-      return <FeaturedCard brand={brand} index={index} />
-    case 'default':
-    default:
-      return <DefaultCard brand={brand} index={index} />
+    case 'compact':  return <CompactCard  brand={brand} index={index} />
+    case 'featured': return <FeaturedCard brand={brand} index={index} />
+    default:         return <DefaultCard  brand={brand} index={index} />
   }
 }

@@ -1,6 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HeroSection } from '@/components/sections/HeroSection'
+import { BrandGallery } from '@/components/sections/BrandGallery'
+import { BrandMarquee } from '@/components/sections/BrandMarquee'
+import { StatsBar } from '@/components/sections/StatsBar'
+import { RecentlyViewedSection } from '@/components/sections/RecentlyViewedSection'
 import { FeaturedBrandsSection } from '@/components/sections/FeaturedBrandsSection'
 import { TrendingBrandsSection } from '@/components/sections/TrendingBrandsSection'
 import { EditorPicksSection } from '@/components/sections/EditorPicksSection'
@@ -22,7 +26,30 @@ export function HomePage() {
     <PageTransition>
       <motion.div className="min-h-screen">
         <HeroSection onSearch={handleSearch} />
-        
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="py-10"
+        >
+          <BrandGallery />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <BrandMarquee />
+        </motion.div>
+
+        <StatsBar />
+
+        <RecentlyViewedSection />
+
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
