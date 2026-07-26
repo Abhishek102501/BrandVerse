@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { env } from '@/config/env'
+// import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 /** Provides a single QueryClient for the app, with dev tools in development only. */
 export function QueryProvider({ children }: { children: ReactNode }) {
@@ -21,7 +20,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       {children}
-      {env.isDev && <ReactQueryDevtools initialIsOpen={false} />}
+      {/* {env.isDev && <ReactQueryDevtools initialIsOpen={false} />} */}
     </QueryClientProvider>
   )
 }
